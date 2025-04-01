@@ -1,0 +1,347 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum CustomerType {
+  COMPANY
+  PERSONAL
+}
+
+model Customer {
+  id             String        @id @default(uuid())
+  customerType   CustomerType
+  name           String
+  document       String?       @unique
+  mainNumber     String?
+  contactNumber  String?       @map("contact_number")
+  address        String        @map("address_description")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+  orders         Order[]
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String        @map("organization_id")
+
+  @@unique([organizationId, document])
+  @@map("customers")
+}
+
+enum UserStatus {
+  ACTIVE
+  PENDING
+  INACTIVE
+}
+
+model User {
+  id                 String         @id @default(uuid())
+  name               String
+  email              String         @unique
+  number             String?        @unique
+  passwordHash       String        @map("password_hash")
+  avatarUrl          String?        @map("avatar_url")
+  status             UserStatus     @default(PENDING)
+  createdAt          DateTime       @default(now()) @map("created_at")
+  updatedAt          DateTime       @updatedAt @map("updated_at")
+  tokens             Token[]
+  accounts           Account[]
+  invites            Invite[]
+  member_on          Member[]
+  owns_organizations Organization[]
+  owns_projects      Project[]
+
+  @@map("users")
+}
+
+enum TokenType {
+  PASSWORD_RECOVER
+  INVITED_USER
+}
+
+model Token {
+  id        String    @id @default(uuid())
+  type      TokenType
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @map("user_id")
+
+  @@unique([id, userId])
+  @@map("tokens")
+}
+
+enum AccountProvider {
+  GITHUB
+  GOOGLE
+  CREDENTIALS
+}
+
+model Account {
+  id                 String          @id @default(uuid())
+  provider           AccountProvider
+  providerAcccountId String          @unique @map("provider_account_id")
+  user               User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId             String          @map("user_id")
+
+  @@unique([provider, userId])
+  @@map("accounts")
+}
+
+enum Role {
+  ADMIN
+  MEMBER
+  BILLING
+  MANAGER
+}
+
+model Invite {
+  id        String   @id @default(uuid())
+  email     String
+  role      Role
+  createdAt DateTime @default(now()) @map("created_at")
+
+  author   User?   @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  authorId String? @map("author_id")
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String       @map("organization_id")
+
+  @@unique([email, organizationId])
+  @@index([email])
+  @@map("invites")
+}
+
+model Member {
+  id                  String              @id @default(uuid())
+  role                Role                @default(MEMBER)
+  organization        Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId      String              @map("organization_id")
+  user                User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId              String              @map("user_id")
+  own_orders          Order[]
+  assigned_jobs       AssignedEmployee[]
+  assigned_comissions AssignedComission[]
+
+  @@unique([organizationId, userId])
+  @@map("members")
+}
+
+model Organization {
+  id                        String   @id @default(uuid())
+  name                      String
+  slug                      String   @unique
+  domain                    String?  @unique
+  shouldAttachUsersByDomain Boolean  @default(true) @map("should_attach_users_by_domain")
+  avatarUrl                 String?  @map("avatar_url")
+  createdAt                 DateTime @default(now()) @map("created_at")
+  updatedAt                 DateTime @updatedAt @map("updated_at")
+
+  owner   User   @relation(fields: [ownerId], references: [id])
+  ownerId String @map("owner_id")
+
+  invites   Invite[]
+  members   Member[]
+  orders    Order[]
+  products  Product[]
+  services  Service[]
+  customers Customer[]
+  projects  Project[]
+
+  @@map("organizations")
+}
+
+model Project {
+  id          String   @id @default(uuid())
+  name        String
+  description String
+  slug        String   @unique
+  avatarUrl   String?  @map("avatar_url")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String       @map("organization_id")
+
+  owner   User   @relation(fields: [ownerId], references: [id])
+  ownerId String @map("owner_id")
+
+  @@map("projects")
+}
+
+model ProductOrder {
+  id        String   @id @default(uuid())
+  quantity  Int
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId   String   @map("order_id")
+  product   Product  @relation(fields: [productId], references: [id])
+  productId String   @map("product_id")
+
+  @@unique([orderId, productId])
+  @@map("product_orders")
+}
+
+model ServiceOrder {
+  id        String   @id @default(uuid())
+  quantity  Int
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId   String   @map("order_id")
+  service   Service  @relation(fields: [serviceId], references: [id])
+  serviceId String   @map("service_id")
+
+  @@unique([orderId, serviceId])
+  @@map("service_orders")
+}
+
+model AssignedEmployee {
+  id             String  @id @default(uuid())
+  employee       Member  @relation(fields: [employeeId], references: [id])
+  employeeId     String  @map("employee_id")
+  assigned_order Order[]
+
+  @@unique([id, employeeId])
+  @@map("assigned_employees")
+}
+
+enum OrderType {
+  SALE
+  BUDGET
+  WARRANTY
+}
+
+model Order {
+  id              String         @id @default(uuid())
+  products_orders ProductOrder[]
+  service_orders  ServiceOrder[]
+  isHidden        Boolean        @default(false) @map("is_hidden")
+  maxExployees    Int?           @default(1) @map("max_employees")
+  createdAt       DateTime       @default(now()) @map("created_at")
+  updatedAt       DateTime       @updatedAt @map("updated_at")
+
+  organization       Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId     String            @map("organization_id")
+  member             Member            @relation(fields: [ownerId], references: [id])
+  ownerId            String            @map("owner_id")
+  customer           Customer          @relation(fields: [customerId], references: [id])
+  customerId         String            @map("customer_id")
+  payment            Payment?          @relation(fields: [paymentId], references: [id])
+  paymentId          String            @map("payment_id")
+  assigned_employee  AssignedEmployee? @relation(fields: [assignedEmployeeId], references: [id])
+  assignedEmployeeId String            @map("assigned_employee_id")
+  comission          Comission?        @relation(fields: [comissionId], references: [id])
+  comissionId        String            @map("comission_id")
+  type               OrderType
+
+  @@unique([id, customerId])
+  @@unique([id, ownerId])
+  @@unique([id, organizationId])
+  @@unique([id, comissionId])
+  @@map("orders")
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  costPrice   Float    @map("cost_price")
+  salesPrice  Float    @map("sales_price")
+  stock       Int
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  organization   Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String         @map("organization_id")
+  product_order  ProductOrder[]
+
+  @@map("products")
+}
+
+model Service {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  price       Float
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  organization   Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String         @map("organization_id")
+  service_order  ServiceOrder[]
+
+  @@map("services")
+}
+
+model PaymentInstallment {
+  id        String   @id @default(uuid())
+  method    String
+  value     Float
+  dueDate   DateTime @map("due_date")
+  status    Boolean
+  payment   Payment  @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  paymentId String   @map("payment_id")
+
+  @@map("payment_installments")
+}
+
+enum PaymentType {
+  PIX
+  CARTAO
+  BOLETO
+  DINHEIRO
+  DEPÓSITO
+  PENDENTE
+}
+
+enum PaymentStatus {
+  PENDING
+  RECEIVED
+  CANCELLED
+}
+
+model Payment {
+  id                   String               @id @default(uuid())
+  method               String
+  price                Float?
+  dueDay               Int?
+  installments         Int?
+  payment_installments PaymentInstallment[]
+  status               PaymentStatus        @default(PENDING)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  order     Order[]
+
+  @@map("payments")
+}
+
+model AssignedComission {
+  id          String    @id @default(uuid())
+  member      Member?   @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  employeeId  String?   @map("member_id")
+  comission   Comission @relation(fields: [comissionId], references: [id], onDelete: Cascade)
+  comissionId String    @map("comission_id")
+
+  @@unique([employeeId, comissionId])
+  @@unique([id, employeeId])
+  @@map("assigned_comissions")
+}
+
+model Comission {
+  id                  String              @id @default(uuid())
+  percentage          Float
+  assigned_comissions AssignedComission[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  order     Order[]
+
+  @@map("comissions")
+}
+
+
