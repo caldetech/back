@@ -17,7 +17,7 @@ export class AuthGuard implements CanActivate {
 
     if (!authorization) return undefined;
 
-    const [type, token] = authorization.split('');
+    const [type, token] = authorization.split(' ');
 
     return type === 'Bearer' ? token : undefined;
   }
@@ -31,7 +31,7 @@ export class AuthGuard implements CanActivate {
     }
 
     try {
-      const payload: unknown = await this.jwtService.verifyAsync(token, {
+      const payload = await this.jwtService.verifyAsync(token, {
         secret: jwtConstants.secret,
       });
 

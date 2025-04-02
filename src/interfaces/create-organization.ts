@@ -1,6 +1,5 @@
-export interface CreateOrganizationInterface {
+export interface CreateOrganizationProps {
   name: string;
   slug: string;
-  domain: string;
   userId: string;
 }

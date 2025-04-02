@@ -127,6 +127,12 @@ model Member {
 
   @@unique([organizationId, userId])
   @@map("members")
+} 
+
+enum OrganizationStatus {
+  ACTIVE
+  PENDING
+  INACTIVE
 }
 
 model Organization {
@@ -134,10 +140,11 @@ model Organization {
   name                      String
   slug                      String   @unique
   domain                    String?  @unique
-  shouldAttachUsersByDomain Boolean  @default(true) @map("should_attach_users_by_domain")
+  shouldAttachUsersByDomain Boolean  @default(false) @map("should_attach_users_by_domain")
   avatarUrl                 String?  @map("avatar_url")
   createdAt                 DateTime @default(now()) @map("created_at")
   updatedAt                 DateTime @updatedAt @map("updated_at")
+  status OrganizationStatus @default(PENDING)
 
   owner   User   @relation(fields: [ownerId], references: [id])
   ownerId String @map("owner_id")
