@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import type { Prisma } from '@prisma/client';
 
 @Injectable()
 export class UserRepository {
@@ -25,7 +26,8 @@ export class UserRepository {
 
       return user;
     } catch (error) {
-      console.log(error);
+      console.error(error);
+      throw error;
     }
   }
 

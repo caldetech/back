@@ -1,9 +1,6 @@
 import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
-import {
-  createUserSchema,
-  type CreateUserDto,
-} from 'src/schemas/user/create-user';
+import { createUserSchema, type CreateUserDto } from 'src/schemas/create-user';
 import { AuthGuard } from '../auth/auth.guard';
 
 @Controller('/users')
@@ -13,22 +10,25 @@ export class UserController {
   @Post('/sign-up')
   async signUp(
     @Body()
-    { name, email, passwordHash }: CreateUserDto,
+    { name, email, password }: CreateUserDto,
   ) {
-    const parsedData = createUserSchema.safeParse({
+    const validatedFields = createUserSchema.safeParse({
       name,
       email,
-      passwordHash,
+      password,
     });
 
-    if (parsedData.success) {
-      await this.userService.createUser(parsedData.data);
+    if (!validatedFields.success) {
+      throw new Error(validatedFields.error.message);
     }
 
-    return {
-      success: parsedData.success,
-      message: parsedData.success ? 'User created' : parsedData.error.message,
-    };
+    const { data } = validatedFields;
+
+    return this.userService.createUser({
+      name: data.name,
+      email: data.email,
+      password: data.password,
+    });
   }
 
   @UseGuards(AuthGuard)

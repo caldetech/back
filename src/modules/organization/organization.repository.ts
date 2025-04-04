@@ -22,6 +22,8 @@ export class OrganizationRepository {
         },
       });
 
+      console.log(organization);
+
       return organization;
     } catch (error) {
       console.log(error);
