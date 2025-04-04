@@ -15,4 +15,8 @@ export class OrganizationService {
       userId,
     });
   }
+
+  async getAllOrganizations({ userId }: { userId: string }) {
+    return this.organizationRepository.getAllOrganizations({ userId });
+  }
 }

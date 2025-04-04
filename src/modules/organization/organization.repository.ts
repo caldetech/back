@@ -27,4 +27,30 @@ export class OrganizationRepository {
       console.log(error);
     }
   }
+
+  async getAllOrganizations({ userId }: { userId: string }) {
+    try {
+      const organizations = await this.prisma.organization.findMany({
+        where: {
+          members: {
+            some: {
+              userId,
+            },
+          },
+        },
+        include: {
+          members: {
+            where: {
+              userId,
+            },
+            take: 1,
+          },
+        },
+      });
+
+      return organizations;
+    } catch (error) {
+      console.log(error);
+    }
+  }
 }

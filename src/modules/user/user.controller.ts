@@ -1,9 +1,10 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import {
   createUserSchema,
   type CreateUserDto,
 } from 'src/schemas/user/create-user';
+import { AuthGuard } from '../auth/auth.guard';
 
 @Controller('/users')
 export class UserController {
@@ -28,5 +29,14 @@ export class UserController {
       success: parsedData.success,
       message: parsedData.success ? 'User created' : parsedData.error.message,
     };
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('/by-email')
+  async getUserByEmail(
+    @Query('email')
+    email: string,
+  ) {
+    return this.userService.getUserByEmail(email);
   }
 }

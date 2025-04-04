@@ -14,6 +14,9 @@ CREATE TYPE "AccountProvider" AS ENUM ('GITHUB', 'GOOGLE', 'CREDENTIALS');
 CREATE TYPE "Role" AS ENUM ('ADMIN', 'MEMBER', 'BILLING', 'MANAGER');
 
 -- CreateEnum
+CREATE TYPE "OrganizationStatus" AS ENUM ('ACTIVE', 'PENDING', 'INACTIVE');
+
+-- CreateEnum
 CREATE TYPE "OrderType" AS ENUM ('SALE', 'BUDGET', 'WARRANTY');
 
 -- CreateEnum
@@ -41,10 +44,10 @@ CREATE TABLE "customers" (
 -- CreateTable
 CREATE TABLE "users" (
     "id" TEXT NOT NULL,
-    "name" TEXT,
+    "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "number" TEXT,
-    "password_hash" TEXT,
+    "password_hash" TEXT NOT NULL,
     "avatar_url" TEXT,
     "status" "UserStatus" NOT NULL DEFAULT 'PENDING',
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -101,10 +104,11 @@ CREATE TABLE "organizations" (
     "name" TEXT NOT NULL,
     "slug" TEXT NOT NULL,
     "domain" TEXT,
-    "should_attach_users_by_domain" BOOLEAN NOT NULL DEFAULT true,
+    "should_attach_users_by_domain" BOOLEAN NOT NULL DEFAULT false,
     "avatar_url" TEXT,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
+    "status" "OrganizationStatus" NOT NULL DEFAULT 'PENDING',
     "owner_id" TEXT NOT NULL,
 
     CONSTRAINT "organizations_pkey" PRIMARY KEY ("id")
