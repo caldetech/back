@@ -22,8 +22,6 @@ export class OrganizationRepository {
         },
       });
 
-      console.log(organization);
-
       return organization;
     } catch (error) {
       console.log(error);
@@ -51,6 +49,20 @@ export class OrganizationRepository {
       });
 
       return organizations;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async getOrganizationBySlug(slug: string) {
+    try {
+      const organization = await this.prisma.organization.findUnique({
+        where: {
+          slug,
+        },
+      });
+
+      return organization;
     } catch (error) {
       console.log(error);
     }
