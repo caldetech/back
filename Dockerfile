@@ -1,14 +1,16 @@
 # Etapa 1 - Build
 FROM node:20-alpine AS builder
 WORKDIR /app
+
+# Instala dependências
 COPY package*.json ./
 RUN npm install
 
-# ⚠️ Gera os arquivos do Prisma
+# Gera arquivos do Prisma
 COPY prisma ./prisma
 RUN npx prisma generate
 
-# ⚠️ Gera os arquivos do TypeScript
+# Gera arquivos do projeto
 COPY . .
 RUN npm run build
 
@@ -16,12 +18,12 @@ RUN npm run build
 FROM node:20-alpine
 WORKDIR /app
 
-# App compilado
+# Copia dist e dependências
 COPY --from=builder /app/dist ./dist
-COPY package*.json ./
-RUN npm ci --omit=dev
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/node_modules ./node_modules
 
-# ⚠️ IMPORTANTE: copiar @prisma e .prisma
+# ⚠️ Copia também os arquivos gerados pelo prisma
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 
