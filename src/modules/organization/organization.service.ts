@@ -19,4 +19,8 @@ export class OrganizationService {
   async getAllOrganizations({ userId }: { userId: string }) {
     return this.organizationRepository.getAllOrganizations({ userId });
   }
+
+  async getOrganizationBySlug(slug: string) {
+    return this.organizationRepository.getOrganizationBySlug(slug);
+  }
 }
