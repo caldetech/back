@@ -8,5 +8,39 @@
     {
       "ContainerPort": "3000"
     }
+  ],
+  "Environment": [
+    {
+      "Name": "DATABASE_URL",
+      "Value": "prisma+postgres://accelerate.prisma-data.net/?api_key=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlfa2V5IjoiY2FhNWYxOWYtNTI1NC00OWMxLWIzNjAtMGJjYjY2YTlhM2NmIiwidGVuYW50X2lkIjoiMzM5NmNmMmJjYjJjMjVlMmM0ZDUyZDYwMjAzZDRmOTZmNjI4OThiZGRlYzNjMDBiZDdiZGE3ODNiYjc0MzFlZCIsImludGVybmFsX3NlY3JldCI6ImU2MTA1N2QwLTdlMzQtNGQ5NS1hOGIzLTRlNTRjZDdiNzBmZiJ9._y5aKG7w2hibt1MaSbKZ8eNBAB8TSMLMXs1YS9lEsDw"
+    },
+    {
+      "Name": "JWT_SECRET",
+      "Value": "my-jwt-secret"
+    },
+    {
+      "Name": "GOOGLE_CLIENT_ID",
+      "Value": "645834901989-e6fft29a0bm5vc7r98k466te4172h1.apps.googleusercontent.com"
+    },
+    {
+      "Name": "GOOGLE_CLIENT_SECRET",
+      "Value": "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"
+    },
+    {
+      "Name": "BLING_API_URL",
+      "Value": "https://bling.com.br/Api/v3/oauth/"
+    },
+    {
+      "Name": "BLING_CLIENT_ID",
+      "Value": "5c22b014ebba6e4833dc80999eb58d7da41a8834"
+    },
+    {
+      "Name": "BLING_CLIENT_SECRET",
+      "Value": "34ffe50ce75773930b4a764bbf58d0c1b0d344604775eb6e3da11362575a"
+    },
+    {
+      "Name": "PORT",
+      "Value": "3000"
+    }
   ]
 }
