@@ -1,21 +1,16 @@
-# Use uma imagem Node oficial
-FROM node:18-alpine
-
-# Diretório da app
+# Etapa 1 - Build
+FROM node:18-alpine AS builder
 WORKDIR /app
-
-# Copia dependências
 COPY package*.json ./
-RUN npm install --production
-
-# Copia código
+RUN npm install
 COPY . .
-
-# Build da app NestJS
 RUN npm run build
 
-# Porta exposta (ajuste se necessário)
+# Etapa 2 - Runtime
+FROM node:18-alpine
+WORKDIR /app
+COPY --from=builder /app/dist ./dist
+COPY package*.json ./
+RUN npm install --production
 EXPOSE 3000
-
-# Comando pra iniciar
 CMD ["node", "dist/main"]
