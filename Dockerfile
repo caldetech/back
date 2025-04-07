@@ -8,7 +8,7 @@ RUN npm install
 
 # Gera arquivos do Prisma
 COPY prisma ./prisma
-RUN npx prisma generate
+RUN npx prisma generate 
 
 # Gera arquivos do projeto
 COPY . .
@@ -26,6 +26,9 @@ COPY --from=builder /app/node_modules ./node_modules
 # ⚠️ Copia também os arquivos gerados pelo prisma
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
+
+# Copia o .env para dentro da imagem
+# COPY .env .env
 
 EXPOSE 3000
 CMD ["node", "dist/main"]

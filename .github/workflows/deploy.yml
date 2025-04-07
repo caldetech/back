@@ -32,7 +32,7 @@ jobs:
         uses: einaregilsson/beanstalk-deploy@v22
         with:
           application_name: management-system_back
-          environment_name: managementSystemBack
+          environment_name: back-end
           version_label: ${{ github.sha }}-${{ github.run_attempt }}
           region: us-east-1
           deployment_package: deploy.zip
