@@ -1,4 +1,4 @@
-name: Deploy to Elastic Beanstalk
+name: Deploy NestJS to Elastic Beanstalk
 
 on:
   push:
@@ -8,27 +8,36 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: 📥 Checkout do código
+        uses: actions/checkout@v4
 
-      - name: Set up Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 20
+      - name: 🔧 Login no Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build app
-        run: npm run build
-
-      - name: Generate Dockerrun
+      - name: 🐳 Build + push da imagem
         run: |
-          echo '{ "AWSEBDockerrunVersion": 1, "Image": { "Name": "<your-dockerhub-or-ecr-repo>:latest", "Update": "true" }, "Ports": [{ "ContainerPort": 3000 }] }' > Dockerrun.aws.json
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/management-backend:${{ github.sha }} .
+          docker push ${{ secrets.DOCKER_USERNAME }}/management-backend:${{ github.sha }}
 
-      - name: Deploy to Elastic Beanstalk
-        uses: einaregilsson/beanstalk-deploy@v20
+      - name: 📄 Gerar Dockerrun.aws.json
+        run: |
+          echo '{
+            "AWSEBDockerrunVersion": "1",
+            "Image": {
+              "Name": "${{ secrets.DOCKER_USERNAME }}/management-backend:${{ github.sha }}",
+              "Update": "true"
+            },
+            "Ports": [
+              {
+                "ContainerPort": "3000"
+              }
+            ]
+          }' > Dockerrun.aws.json
+
+      - name: 🚀 Deploy no Elastic Beanstalk
+        uses: einaregilsson/beanstalk-deploy@v21
         with:
           application_name: management-system_back
           environment_name: managementSystemBack
