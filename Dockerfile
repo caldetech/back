@@ -28,7 +28,7 @@ COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 
 # Copia o .env para dentro da imagem
-# COPY .env .env
+COPY .env .env
 
-EXPOSE 3000
+EXPOSE 3333
 CMD ["node", "dist/main"]
