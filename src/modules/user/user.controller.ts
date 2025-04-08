@@ -7,6 +7,11 @@ import { AuthGuard } from '../auth/auth.guard';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @Post('/confirm-account')
+  async confirmAccount(@Body() { tokenId }: { tokenId: string }) {
+    return this.userService.confirmAccount({ tokenId });
+  }
+
   @Post('/register')
   async signUp(
     @Body()

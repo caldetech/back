@@ -6,7 +6,11 @@ import { Token } from 'src/schemas/token';
 export class TokenRepository {
   constructor(private readonly prisma: PrismaService) {}
   async findTokenById(tokenId: string) {
-    return { id: tokenId, value: 'sample-token' };
+    return await this.prisma.token.findUnique({
+      where: {
+        id: tokenId,
+      },
+    });
   }
 
   async createToken({ userId, type }: { userId: string; type: Token }) {

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { OrganizationRepository } from './organization.repository';
 import { CreateOrganizationDto } from 'src/schemas/create-organization';
 
@@ -9,6 +9,13 @@ export class OrganizationService {
   ) {}
 
   async createOrganization({ name, slug, userId }: CreateOrganizationDto) {
+    const existingOrganization =
+      await this.organizationRepository.getOrganizationBySlug(slug);
+
+    if (existingOrganization) {
+      throw new UnauthorizedException('Essa organização já existe');
+    }
+
     return this.organizationRepository.createOrganization({
       name,
       slug,

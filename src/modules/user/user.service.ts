@@ -14,6 +14,22 @@ export class UserService {
     private readonly emailService: EmailService,
   ) {}
 
+  async confirmAccount({ tokenId }: { tokenId: string }) {
+    const tokenData = await this.tokenService.findTokenById(tokenId);
+
+    if (!tokenData) {
+      throw new BadRequestException('Invalid token');
+    }
+
+    const user = await this.userRepository.getUserById(tokenData.userId);
+
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    return this.userRepository.confirmAccount({ userId: user.id });
+  }
+
   async createUser({ name, email, password }: CreateUserDto) {
     const user = await this.userRepository.getUserByEmail(email);
 

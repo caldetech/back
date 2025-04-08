@@ -6,6 +6,17 @@ import type { Prisma } from '@prisma/client';
 export class UserRepository {
   constructor(private readonly prisma: PrismaService) {}
 
+  async confirmAccount({ userId }: { userId: string }) {
+    return await this.prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        status: 'ACTIVE',
+      },
+    });
+  }
+
   async createUser({
     name,
     email,
@@ -36,6 +47,20 @@ export class UserRepository {
       const user = await this.prisma.user.findUnique({
         where: {
           email,
+        },
+      });
+
+      return user;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async getUserById(id: string) {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: {
+          id,
         },
       });
 
