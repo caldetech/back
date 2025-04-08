@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Role } from 'src/schemas/roles';
+import { Role } from 'src/schemas/role';
 
 @Injectable()
 export class InviteRepository {

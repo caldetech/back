@@ -14,7 +14,9 @@ async function bootstrap() {
     new FastifyAdapter(),
   );
 
-  app.enableCors();
+  app.enableCors({
+    origin: 'http://localhost:3000',
+  });
 
   app.register(fastifyStatic, {
     root: join(__dirname, '..', 'public'),

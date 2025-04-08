@@ -58,7 +58,8 @@ model User {
 
 enum TokenType {
   PASSWORD_RECOVER
-  INVITED_USER
+  CONFIRM_ACCOUNT
+  INVITE_USER
 }
 
 model Token {

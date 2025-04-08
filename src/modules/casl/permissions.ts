@@ -2,7 +2,7 @@ import { AbilityBuilder } from '@casl/ability';
 
 import { AppAbility } from './types/casl.types';
 import { User } from './models/user';
-import { Role } from '../../schemas/roles';
+import { Role } from '../../schemas/role';
 
 type PermissionsByRole = (
   user: User,

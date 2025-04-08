@@ -7,7 +7,7 @@ import { AuthGuard } from '../auth/auth.guard';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post('/sign-up')
+  @Post('/register')
   async signUp(
     @Body()
     { name, email, password }: CreateUserDto,

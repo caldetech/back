@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import type { CreateOrganizationProps } from 'src/interfaces/create-organization';
 import { OrganizationRepository } from './organization.repository';
+import { CreateOrganizationDto } from 'src/schemas/create-organization';
 
 @Injectable()
 export class OrganizationService {
@@ -8,7 +8,7 @@ export class OrganizationService {
     private readonly organizationRepository: OrganizationRepository,
   ) {}
 
-  async createOrganization({ name, slug, userId }: CreateOrganizationProps) {
+  async createOrganization({ name, slug, userId }: CreateOrganizationDto) {
     return this.organizationRepository.createOrganization({
       name,
       slug,
