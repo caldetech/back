@@ -30,12 +30,16 @@ export class UserService {
         passwordHash,
       });
 
+      console.log('newUser', newUser);
+
       const accountConfirmationToken = await this.tokenService.createToken({
         userId: newUser.id,
         type: 'CONFIRM_ACCOUNT',
       });
 
-      await this.emailService.sendEmail({
+      console.log('accountConfirmationToken', accountConfirmationToken);
+
+      this.emailService.sendEmail({
         type: 'CONFIRM_ACCOUNT',
         from: 'Caldetech <noreply@caldetech.com.br>',
         to: newUser.email,
@@ -48,6 +52,11 @@ export class UserService {
     } catch (error) {
       throw new BadRequestException('Error creating user', error.message);
     }
+
+    return {
+      success: true,
+      message: 'User created successfully',
+    };
   }
 
   async getUserByEmail(email: string) {

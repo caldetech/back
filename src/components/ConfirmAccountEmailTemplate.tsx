@@ -7,12 +7,10 @@ interface EmailTemplateProps {
 
 export const EmailTemplate = ({ name, token }: EmailTemplateProps) => (
   <div>
-    <h1>Olá, {name}!</h1>
+    <p>Você foi convidado(a) para ingressar na equipe:</p>
 
-    <p>Clique no link abaixo para confirmar sua conta:</p>
-
-    <a href={`${process.env.FRONT_END}/confirm-account?token=${token}`}>
-      Confirmar conta
+    <a href={`${process.env.FRONT_END}/confirmar-conta?token=${token}`}>
+      Clique aqui para se cadastrar
     </a>
   </div>
 );
