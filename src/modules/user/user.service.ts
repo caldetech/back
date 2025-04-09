@@ -36,10 +36,16 @@ export class UserService {
 
     const passwordHash = await hash(password, 6);
 
-    return this.userRepository.updatePassword({
+    const updatedUser = await this.userRepository.updatePassword({
       userId: user.id,
       passwordHash,
     });
+
+    if (updatedUser) {
+      await this.tokenService.deleteToken(tokenId);
+    }
+
+    return updatedUser;
   }
 
   async confirmAccount({ tokenId }: { tokenId: string }) {
@@ -55,7 +61,15 @@ export class UserService {
       throw new BadRequestException('Usuário não encontrado');
     }
 
-    return this.userRepository.confirmAccount({ userId: user.id });
+    const confirmedAccount = await this.userRepository.confirmAccount({
+      userId: user.id,
+    });
+
+    if (confirmedAccount) {
+      await this.tokenService.deleteToken(tokenId);
+    }
+
+    return confirmedAccount;
   }
 
   async createUser({ name, email, password }: CreateUserDto) {
