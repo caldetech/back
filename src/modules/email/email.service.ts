@@ -6,9 +6,8 @@ import { ResendService } from '../resend/resend.service';
 export class EmailService {
   constructor(private readonly resendService: ResendService) {}
 
-  async sendEmail({ type, from, to, subject, react }: Email) {
+  async sendEmail({ from, to, subject, react }: Email) {
     return await this.resendService.sendEmail({
-      type,
       from,
       to,
       subject,

@@ -25,7 +25,7 @@ export class AuthService {
 
     if (user.status === 'PENDING') {
       throw new UnauthorizedException(
-        'O usuário não está ativado. Verifique seu e-mail.',
+        'Sua conta ainda não foi ativada. Verifique seu e-mail.',
       );
     }
 

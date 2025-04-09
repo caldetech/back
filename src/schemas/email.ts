@@ -3,7 +3,6 @@ import { isValidElement } from 'react';
 import { z } from 'zod';
 
 export const emailSchema = z.object({
-  type: z.enum(['PASSWORD_RECOVER', 'CONFIRM_ACCOUNT', 'INVITE_USER']),
   from: z.string().email(),
   to: z.string().email(),
   subject: z.string(),

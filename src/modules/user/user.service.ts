@@ -4,7 +4,8 @@ import { hash } from 'bcryptjs';
 import { TokenService } from '../token/token.service';
 import { EmailService } from '../email/email.service';
 import { CreateUserDto } from 'src/schemas/create-user';
-import { EmailTemplate } from 'src/components/ConfirmAccountEmailTemplate';
+import { EmailTemplate } from 'src/components/EmailTemplate';
+import { EmailTypes } from 'src/enums';
 
 @Injectable()
 export class UserService {
@@ -14,17 +15,44 @@ export class UserService {
     private readonly emailService: EmailService,
   ) {}
 
-  async confirmAccount({ tokenId }: { tokenId: string }) {
+  async updatePassword({
+    tokenId,
+    password,
+  }: {
+    tokenId: string;
+    password: string;
+  }) {
     const tokenData = await this.tokenService.findTokenById(tokenId);
 
     if (!tokenData) {
-      throw new BadRequestException('Invalid token');
+      throw new BadRequestException('Token inválido');
     }
 
     const user = await this.userRepository.getUserById(tokenData.userId);
 
     if (!user) {
-      throw new BadRequestException('User not found');
+      throw new BadRequestException('Usuário não encontrado');
+    }
+
+    const passwordHash = await hash(password, 6);
+
+    return this.userRepository.updatePassword({
+      userId: user.id,
+      passwordHash,
+    });
+  }
+
+  async confirmAccount({ tokenId }: { tokenId: string }) {
+    const tokenData = await this.tokenService.findTokenById(tokenId);
+
+    if (!tokenData) {
+      throw new BadRequestException('Token inválido');
+    }
+
+    const user = await this.userRepository.getUserById(tokenData.userId);
+
+    if (!user) {
+      throw new BadRequestException('Usuário não encontrado');
     }
 
     return this.userRepository.confirmAccount({ userId: user.id });
@@ -34,7 +62,7 @@ export class UserService {
     const user = await this.userRepository.getUserByEmail(email);
 
     if (user) {
-      throw new BadRequestException('User already exists');
+      throw new BadRequestException('Usuário já existe');
     }
 
     try {
@@ -46,32 +74,61 @@ export class UserService {
         passwordHash,
       });
 
-      console.log('newUser', newUser);
-
       const accountConfirmationToken = await this.tokenService.createToken({
         userId: newUser.id,
-        type: 'CONFIRM_ACCOUNT',
+        type: EmailTypes.CONFIRM_ACCOUNT,
       });
 
-      console.log('accountConfirmationToken', accountConfirmationToken);
-
       this.emailService.sendEmail({
-        type: 'CONFIRM_ACCOUNT',
         from: 'Caldetech <noreply@caldetech.com.br>',
         to: newUser.email,
         subject: 'Convite para plataforma de gestão da empresa',
         react: EmailTemplate({
+          type: EmailTypes.CONFIRM_ACCOUNT,
           name: newUser.name,
           token: accountConfirmationToken.id,
         }),
       });
     } catch (error) {
-      throw new BadRequestException('Error creating user', error.message);
+      throw new BadRequestException('Erro ao criar o usuário', error.message);
     }
 
     return {
       success: true,
-      message: 'User created successfully',
+      message: 'Usuário criado com sucesso',
+    };
+  }
+
+  async passwordRecover({ email }: { email: string }) {
+    const user = await this.userRepository.getUserByEmail(email);
+
+    if (!user) {
+      throw new BadRequestException('Endereço de e-mail inválido');
+    }
+
+    try {
+      const passwordRecoverToken = await this.tokenService.createToken({
+        userId: user.id,
+        type: EmailTypes.PASSWORD_RECOVER,
+      });
+
+      this.emailService.sendEmail({
+        from: 'Caldetech <noreply@caldetech.com.br>',
+        to: user.email,
+        subject: 'Recuperação de senha',
+        react: EmailTemplate({
+          type: EmailTypes.PASSWORD_RECOVER,
+          name: user.name,
+          token: passwordRecoverToken.id,
+        }),
+      });
+    } catch (error) {
+      throw new BadRequestException('Erro ao recuperar senha', error.message);
+    }
+
+    return {
+      success: true,
+      message: 'Recuperação de senha enviada',
     };
   }
 
