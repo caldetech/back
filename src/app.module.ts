@@ -12,6 +12,7 @@ import { InviteModule } from './modules/invite/invite.module';
 import { TokenModule } from './modules/token/token.module';
 import { EmailModule } from './modules/email/email.module';
 import { ResendModule } from './modules/resend/resend.module';
+import { BlingModule } from './modules/bling/bling.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { ResendModule } from './modules/resend/resend.module';
     TokenModule,
     EmailModule,
     ResendModule,
+    BlingModule,
   ],
   controllers: [AppController],
   providers: [AppService],
