@@ -25,6 +25,10 @@ export class TokenRepository {
   }
 
   async deleteToken(tokenId: string) {
-    return { success: true };
+    return await this.prisma.token.delete({
+      where: {
+        id: tokenId,
+      },
+    });
   }
 }
