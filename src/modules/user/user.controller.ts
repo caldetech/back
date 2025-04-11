@@ -1,11 +1,23 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { createUserSchema, type CreateUserDto } from 'src/schemas/create-user';
 import { AuthGuard } from '../auth/auth.guard';
+import { BlingService } from '../bling/bling.service';
 
 @Controller('/users')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly blingService: BlingService,
+  ) {}
 
   @Post('/new-password')
   async updatePassword(
@@ -64,5 +76,14 @@ export class UserController {
     email: string,
   ) {
     return this.userService.getUserByEmail(email);
+  }
+
+  @Get('/all')
+  @UseGuards(AuthGuard)
+  async getUsers(@Query('page') page: number, @Query('limit') limit: number) {
+    return await this.userService.getUsers({
+      page,
+      limit,
+    });
   }
 }

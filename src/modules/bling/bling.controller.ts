@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -30,5 +31,25 @@ export class BlingController {
   @UseGuards(AuthGuard)
   async getValidAccessToken(@Body() { slug }: { slug: string }) {
     return await this.blingService.getValidAccessToken({ slug });
+  }
+
+  @Post('/get-products')
+  @UseGuards(AuthGuard)
+  async getProducts(
+    @Query('page') page: number,
+    @Query('limit') limit: number,
+    @Body() { slug }: { slug: string },
+  ) {
+    const blingTokens = await this.blingService.getValidAccessToken({ slug });
+
+    if (!blingTokens) {
+      throw new BadRequestException('Erro ao obter tokens do Bling');
+    }
+
+    console.log(blingTokens);
+
+    return await this.blingService.getProducts({
+      accessToken: blingTokens.accessToken,
+    });
   }
 }

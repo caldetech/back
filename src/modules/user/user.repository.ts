@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Catch, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import type { Role } from 'src/schemas/role';
+import { Role } from 'src/schemas/role';
 
 @Injectable()
 export class UserRepository {
@@ -93,28 +93,6 @@ export class UserRepository {
     }
   }
 
-  // async updateUserEmail({
-  //   email,
-  // }: {
-  //   email: string;
-  // }) {
-  //   try {
-  //     const user = await this.prisma.user.update({
-  //       where: {
-  //         email,
-  //       },
-  //       data: {
-  //         ,
-  //       },
-  //     });
-
-  //     return user;
-  //   } catch (error) {
-  //     console.error(error);
-  //     throw error;
-  //   }
-  // }
-
   async getUserByEmail(email: string) {
     try {
       const user = await this.prisma.user.findUnique({
@@ -140,6 +118,35 @@ export class UserRepository {
       return user;
     } catch (error) {
       console.log(error);
+    }
+  }
+
+  async getUsers({ page, limit }: { page: number; limit: number }) {
+    try {
+      const skip = (page - 1) * limit;
+
+      const users = await this.prisma.user.findMany({
+        skip,
+        take: limit,
+        select: {
+          id: true,
+          name: true,
+          number: true,
+          status: true,
+        },
+      });
+
+      const total = await this.prisma.user.count();
+
+      return {
+        data: users,
+        page: {
+          total,
+        },
+      };
+    } catch (error) {
+      console.error(error.message);
+      throw error;
     }
   }
 }

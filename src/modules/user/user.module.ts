@@ -8,6 +8,7 @@ import { EmailModule } from '../email/email.module';
 import { MemberModule } from '../member/member.module';
 import { OrganizationModule } from '../organization/organization.module';
 import { InviteModule } from '../invite/invite.module';
+import { BlingModule } from '../bling/bling.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { InviteModule } from '../invite/invite.module';
     EmailModule,
     MemberModule,
     OrganizationModule,
+    BlingModule,
   ],
   providers: [UserService, UserRepository, PrismaService],
   controllers: [UserController],

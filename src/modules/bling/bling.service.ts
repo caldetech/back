@@ -147,4 +147,15 @@ export class BlingService {
 
     return token;
   }
+
+  async getProducts({ accessToken, page = 1, limit = 5 }) {
+    const response = await ky.get('https://api.bling.com.br/Api/v3/produtos', {
+      searchParams: { pagina: page.toString(), limite: limit.toString() },
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    return response.json();
+  }
 }

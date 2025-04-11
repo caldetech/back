@@ -241,4 +241,14 @@ export class UserService {
   async getUserByEmail(email: string) {
     return await this.userRepository.getUserByEmail(email);
   }
+
+  async getUsers({ page, limit }: { page: number; limit: number }) {
+    const numericPage = Number(page);
+    const numericLimit = Number(limit);
+
+    return await this.userRepository.getUsers({
+      page: numericPage,
+      limit: numericLimit,
+    });
+  }
 }

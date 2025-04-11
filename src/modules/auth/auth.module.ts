@@ -4,9 +4,11 @@ import { AuthService } from './auth.service';
 import { UserModule } from '../user/user.module';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
+import { BlingModule } from '../bling/bling.module';
 
 @Module({
   imports: [
+    BlingModule,
     UserModule,
     JwtModule.register({
       global: true,
