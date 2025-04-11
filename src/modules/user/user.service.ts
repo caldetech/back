@@ -242,13 +242,22 @@ export class UserService {
     return await this.userRepository.getUserByEmail(email);
   }
 
-  async getUsers({ page, limit }: { page: number; limit: number }) {
+  async getUsers({
+    page,
+    limit,
+    slug,
+  }: {
+    page: number;
+    limit: number;
+    slug: string;
+  }) {
     const numericPage = Number(page);
     const numericLimit = Number(limit);
 
     return await this.userRepository.getUsers({
       page: numericPage,
       limit: numericLimit,
+      slug,
     });
   }
 }

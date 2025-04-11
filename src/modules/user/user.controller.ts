@@ -80,10 +80,15 @@ export class UserController {
 
   @Get('/all')
   @UseGuards(AuthGuard)
-  async getUsers(@Query('page') page: number, @Query('limit') limit: number) {
+  async getUsers(
+    @Query('page') page: number,
+    @Query('limit') limit: number,
+    @Query('slug') slug: string,
+  ) {
     return await this.userService.getUsers({
       page,
       limit,
+      slug,
     });
   }
 }

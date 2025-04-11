@@ -46,8 +46,6 @@ export class BlingController {
       throw new BadRequestException('Erro ao obter tokens do Bling');
     }
 
-    console.log(blingTokens);
-
     return await this.blingService.getProducts({
       accessToken: blingTokens.accessToken,
     });
