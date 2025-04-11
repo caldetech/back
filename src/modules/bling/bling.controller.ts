@@ -33,12 +33,12 @@ export class BlingController {
     return await this.blingService.getValidAccessToken({ slug });
   }
 
-  @Post('/get-products')
+  @Get('/get-products')
   @UseGuards(AuthGuard)
   async getProducts(
     @Query('page') page: number,
     @Query('limit') limit: number,
-    @Body() { slug }: { slug: string },
+    @Query('slug') slug: string,
   ) {
     const blingTokens = await this.blingService.getValidAccessToken({ slug });
 
@@ -48,6 +48,8 @@ export class BlingController {
 
     return await this.blingService.getProducts({
       accessToken: blingTokens.accessToken,
+      page,
+      limit,
     });
   }
 }

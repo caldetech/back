@@ -3,6 +3,10 @@ import ky from 'ky';
 import { BlingTokensSchema } from 'src/schemas/bling-tokens';
 import { OrganizationService } from '../organization/organization.service';
 import { BlingRepository } from './bling.repository';
+import type {
+  BlingProduct,
+  BlingProductResponse,
+} from 'src/schemas/bling-product';
 
 @Injectable()
 export class BlingService {
@@ -148,14 +152,33 @@ export class BlingService {
     return token;
   }
 
-  async getProducts({ accessToken, page = 1, limit = 5 }) {
-    const response = await ky.get('https://api.bling.com.br/Api/v3/produtos', {
-      searchParams: { pagina: page.toString(), limite: limit.toString() },
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
+  async getProducts({
+    accessToken,
+    page = 1,
+    limit = 5,
+  }): Promise<BlingProductResponse> {
+    const response = await ky
+      .get('https://api.bling.com.br/Api/v3/produtos', {
+        searchParams: { pagina: page.toString(), limite: limit },
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          Accept: '1.0',
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+      .json<BlingProductResponse>();
 
-    return response.json();
+    const filteredData = response.data.map((item: BlingProduct) => ({
+      id: item.id,
+      nome: item.nome,
+      preco: item.preco,
+      precoCusto: item.precoCusto,
+    }));
+
+    console.log(filteredData);
+
+    return {
+      data: filteredData,
+    };
   }
 }
