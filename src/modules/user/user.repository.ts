@@ -1,9 +1,44 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import type { Role } from 'src/schemas/role';
 
 @Injectable()
 export class UserRepository {
   constructor(private readonly prisma: PrismaService) {}
+
+  async createUserByInvite({
+    name,
+    role,
+    email,
+    inviteId,
+    passwordHash,
+    organizationId,
+  }: {
+    role: Role;
+    name: string;
+    email: string;
+    inviteId: string;
+    passwordHash: string;
+    organizationId: string;
+  }) {
+    try {
+      return await this.prisma.user.create({
+        data: {
+          name,
+          email,
+          passwordHash,
+          member_on: {
+            create: {
+              organizationId,
+              role,
+            },
+          },
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   async updatePassword({
     userId,

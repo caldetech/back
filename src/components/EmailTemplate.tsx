@@ -3,18 +3,38 @@ import { EmailTypes } from 'src/enums';
 
 interface EmailTemplateProps {
   type: EmailTypes;
-  name: string;
-  token: string;
+  name?: string;
+  role?: string;
+  slug?: string;
+  tokenId?: string;
+  inviteId?: string;
 }
 
-export const EmailTemplate = ({ type, name, token }: EmailTemplateProps) => (
+export const EmailTemplate = ({
+  type,
+  name,
+  slug,
+  role,
+  tokenId,
+  inviteId,
+}: EmailTemplateProps) => (
   <>
+    {type === EmailTypes.INVITE_USER && (
+      <div>
+        <p>Olá,</p>
+        <p>Você foi convidado(a) para ingressar na equipe:</p>
+        <a href={`${process.env.FRONT_END}/cadastrar?inviteId=${inviteId}`}>
+          Clique aqui para se cadastrar
+        </a>
+      </div>
+    )}
+
     {type === EmailTypes.CONFIRM_ACCOUNT && (
       <div>
         <p>Olá {name},</p>
-        <p>Você foi convidado(a) para ingressar na equipe:</p>
-        <a href={`${process.env.FRONT_END}/confirmar-conta?token=${token}`}>
-          Clique aqui para se cadastrar
+        <p>Confirme sua conta para acessar a plataforma:</p>
+        <a href={`${process.env.FRONT_END}/confirmar-conta?tokenId=${tokenId}`}>
+          Clique aqui para confirmar sua conta
         </a>
       </div>
     )}
@@ -24,8 +44,8 @@ export const EmailTemplate = ({ type, name, token }: EmailTemplateProps) => (
         <p>Olá {name},</p>
         <p>Você solicitou a recuperação da sua senha.</p>
         <p>Clique no link abaixo para redefinir:</p>
-        <a href={`${process.env.FRONT_END}/nova-senha?token=${token}`}>
-          Redefinir senha
+        <a href={`${process.env.FRONT_END}/nova-senha?token=${tokenId}`}>
+          Clique aqui para redefinir sua senha
         </a>
       </div>
     )}

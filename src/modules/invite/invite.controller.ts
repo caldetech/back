@@ -20,8 +20,7 @@ export class InviteController {
 
   @Post('/create')
   @HttpCode(HttpStatus.CREATED)
-  @CheckPoliciesFromRole((ability) => ability.can('create', 'Invite'))
-  @UseGuards(AuthGuard, OrganizationContextGuard, PoliciesGuard)
+  @UseGuards(AuthGuard)
   async createInvite(
     @Request() req,
     @Body()
@@ -35,14 +34,13 @@ export class InviteController {
       slug: string;
     },
   ) {
-    // const authorId = req.user.id;
-    console.log(req.user);
+    const user = req.user;
 
-    // await this.inviteService.createInvite({
-    //   email,
-    //   role,
-    //   authorId,
-    //   organizationId,
-    // });
+    await this.inviteService.createInvite({
+      slug,
+      role,
+      email,
+      authorId: user.id,
+    });
   }
 }

@@ -34,7 +34,7 @@ export class UserController {
   @Post('/register')
   async signUp(
     @Body()
-    { name, email, password }: CreateUserDto,
+    { name, email, password, inviteId, tokenId }: CreateUserDto,
   ) {
     const validatedFields = createUserSchema.safeParse({
       name,
@@ -52,6 +52,8 @@ export class UserController {
       name: data.name,
       email: data.email,
       password: data.password,
+      inviteId,
+      tokenId,
     });
   }
 

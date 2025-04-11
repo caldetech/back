@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  forwardRef,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { UserRepository } from './user.repository';
 import { hash } from 'bcryptjs';
 import { TokenService } from '../token/token.service';
@@ -6,14 +11,47 @@ import { EmailService } from '../email/email.service';
 import { CreateUserDto } from 'src/schemas/create-user';
 import { EmailTemplate } from 'src/components/EmailTemplate';
 import { EmailTypes } from 'src/enums';
+import { MemberService } from '../member/member.service';
+import { OrganizationService } from '../organization/organization.service';
+import { InviteService } from '../invite/invite.service';
+import type { Role } from 'src/schemas/role';
 
 @Injectable()
 export class UserService {
   constructor(
+    @Inject(forwardRef(() => InviteService))
+    private readonly inviteService: InviteService,
     private readonly userRepository: UserRepository,
     private readonly tokenService: TokenService,
     private readonly emailService: EmailService,
+    private readonly memberService: MemberService,
+    private readonly organizationService: OrganizationService,
   ) {}
+
+  async createUserByInvite({
+    name,
+    role,
+    email,
+    inviteId,
+    passwordHash,
+    organizationId,
+  }: {
+    role: Role;
+    name: string;
+    email: string;
+    inviteId: string;
+    passwordHash: string;
+    organizationId: string;
+  }) {
+    return await this.userRepository.createUserByInvite({
+      name,
+      role,
+      email,
+      inviteId,
+      passwordHash,
+      organizationId,
+    });
+  }
 
   async updatePassword({
     tokenId,
@@ -72,7 +110,13 @@ export class UserService {
     return confirmedAccount;
   }
 
-  async createUser({ name, email, password }: CreateUserDto) {
+  async createUser({
+    name,
+    email,
+    tokenId,
+    password,
+    inviteId,
+  }: CreateUserDto) {
     const user = await this.userRepository.getUserByEmail(email);
 
     if (user) {
@@ -81,6 +125,54 @@ export class UserService {
 
     try {
       const passwordHash = await hash(password, 6);
+
+      if (inviteId) {
+        const invite = await this.inviteService.getInviteById({ inviteId });
+
+        if (invite) {
+          try {
+            const newUser = await this.userRepository.createUserByInvite({
+              name,
+              email,
+              passwordHash,
+              role: invite.role,
+              inviteId: invite.id,
+              organizationId: invite.organizationId,
+            });
+
+            if (!newUser) {
+              throw new BadRequestException('Erro ao criar usuário');
+            }
+
+            const accountConfirmationToken =
+              await this.tokenService.createToken({
+                userId: newUser.id,
+                type: EmailTypes.CONFIRM_ACCOUNT,
+              });
+
+            this.emailService.sendEmail({
+              from: 'Caldetech <noreply@caldetech.com.br>',
+              to: newUser.email,
+              subject: 'Convite para plataforma de gestão da empresa',
+              react: EmailTemplate({
+                type: EmailTypes.CONFIRM_ACCOUNT,
+                name: newUser.name,
+                tokenId: accountConfirmationToken.id,
+              }),
+            });
+          } catch (error) {
+            throw new BadRequestException(
+              'Erro ao criar o usuário',
+              error.message,
+            );
+          }
+
+          return {
+            success: true,
+            message: 'Usuário criado com sucesso',
+          };
+        }
+      }
 
       const newUser = await this.userRepository.createUser({
         name,
@@ -100,7 +192,7 @@ export class UserService {
         react: EmailTemplate({
           type: EmailTypes.CONFIRM_ACCOUNT,
           name: newUser.name,
-          token: accountConfirmationToken.id,
+          tokenId: accountConfirmationToken.id,
         }),
       });
     } catch (error) {
@@ -133,7 +225,7 @@ export class UserService {
         react: EmailTemplate({
           type: EmailTypes.PASSWORD_RECOVER,
           name: user.name,
-          token: passwordRecoverToken.id,
+          tokenId: passwordRecoverToken.id,
         }),
       });
     } catch (error) {
