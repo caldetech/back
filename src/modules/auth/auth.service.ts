@@ -10,17 +10,23 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async signIn(email: string, password: string): Promise<{ token: string }> {
+  async logIn(email: string, password: string): Promise<{ token: string }> {
     const user = await this.userService.getUserByEmail(email);
 
     if (!user) {
-      throw new UnauthorizedException('Invalid email or password');
+      throw new UnauthorizedException('E-mail ou senha inválidos');
     }
 
     const isPasswordValid = await compare(password, user.passwordHash);
 
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid email or password');
+      throw new UnauthorizedException('E-mail ou senha inválidos');
+    }
+
+    if (user.status === 'PENDING') {
+      throw new UnauthorizedException(
+        'Sua conta ainda não foi ativada. Verifique seu e-mail.',
+      );
     }
 
     const payload = {
@@ -31,8 +37,6 @@ export class AuthService {
     };
 
     const token = await this.jwtService.signAsync(payload);
-
-    console.log(token);
 
     return { token };
   }

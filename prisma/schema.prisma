@@ -58,7 +58,8 @@ model User {
 
 enum TokenType {
   PASSWORD_RECOVER
-  INVITED_USER
+  CONFIRM_ACCOUNT
+  INVITE_USER
 }
 
 model Token {
@@ -158,6 +159,7 @@ model Organization {
   projects  Project[]
 
   @@map("organizations")
+  BlingToken BlingToken[]
 }
 
 model Project {
@@ -350,5 +352,21 @@ model Comission {
 
   @@map("comissions")
 }
+
+model BlingToken {
+  id              String   @id @default(uuid())
+  accessToken     String   @map("access_token")
+  refreshToken    String   @map("refresh_token")
+  expiresAt       DateTime @map("expires_at")
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId  String   @map("organization_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([organizationId])
+  @@map("bling_tokens")
+}
+
 
 

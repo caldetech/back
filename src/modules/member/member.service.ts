@@ -17,4 +17,25 @@ export class MemberService {
       organizationId,
     });
   }
+
+  async createMember({ userId, role, organizationId }) {
+    return await this.memberRepository.createMember({
+      userId,
+      role,
+      organizationId,
+    });
+  }
+
+  async getMemberByEmailAndOrganizationId({
+    email,
+    organizationId,
+  }: {
+    email: string;
+    organizationId: string;
+  }) {
+    return await this.memberRepository.getMemberByEmailAndOrganizationId({
+      email,
+      organizationId,
+    });
+  }
 }

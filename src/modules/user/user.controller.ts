@@ -7,10 +7,34 @@ import { AuthGuard } from '../auth/auth.guard';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post('/sign-up')
+  @Post('/new-password')
+  async updatePassword(
+    @Body()
+    { tokenId, password }: { tokenId: string; password: string },
+  ) {
+    return this.userService.updatePassword({
+      tokenId,
+      password,
+    });
+  }
+
+  @Post('/password-recover')
+  async passwordRecover(
+    @Body()
+    { email }: { email: string },
+  ) {
+    return this.userService.passwordRecover({ email });
+  }
+
+  @Post('/confirm-account')
+  async confirmAccount(@Body() { tokenId }: { tokenId: string }) {
+    return this.userService.confirmAccount({ tokenId });
+  }
+
+  @Post('/register')
   async signUp(
     @Body()
-    { name, email, password }: CreateUserDto,
+    { name, email, password, inviteId, tokenId }: CreateUserDto,
   ) {
     const validatedFields = createUserSchema.safeParse({
       name,
@@ -28,6 +52,8 @@ export class UserController {
       name: data.name,
       email: data.email,
       password: data.password,
+      inviteId,
+      tokenId,
     });
   }
 

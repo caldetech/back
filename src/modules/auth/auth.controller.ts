@@ -16,12 +16,12 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @HttpCode(HttpStatus.OK)
-  @Post('/sign-in')
-  async signIn(
+  @Post('/log-in')
+  async logIn(
     @Body()
     { email, password }: { email: string; password: string },
   ) {
-    return this.authService.signIn(email, password);
+    return this.authService.logIn(email, password);
   }
 
   @UseGuards(AuthGuard)

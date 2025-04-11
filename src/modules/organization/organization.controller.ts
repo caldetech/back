@@ -19,13 +19,12 @@ import { PoliciesGuard } from '../authorization/guards/policies.guard';
 export class OrganizationController {
   constructor(private readonly organizationService: OrganizationService) {}
 
-  @Post('/:slug/create')
+  @Post('/create')
   @HttpCode(HttpStatus.CREATED)
   @UseGuards(AuthGuard)
   async createOrganization(
-    @Param('slug') slug: string,
     @Request() req,
-    @Body() { name }: { name: string },
+    @Body() { name, slug }: { name: string; slug: string },
   ) {
     return this.organizationService.createOrganization({
       name,
