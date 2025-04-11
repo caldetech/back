@@ -13,6 +13,9 @@ import { TokenModule } from './modules/token/token.module';
 import { EmailModule } from './modules/email/email.module';
 import { ResendModule } from './modules/resend/resend.module';
 import { BlingModule } from './modules/bling/bling.module';
+import { ServiceModule } from './modules/service/service.module';
+import { CustomerModule } from './modules/customer/customer.module';
+import { ComissionModule } from './modules/comission/comission.module';
 
 @Module({
   imports: [
@@ -28,6 +31,9 @@ import { BlingModule } from './modules/bling/bling.module';
     EmailModule,
     ResendModule,
     BlingModule,
+    ServiceModule,
+    CustomerModule,
+    ComissionModule,
   ],
   controllers: [AppController],
   providers: [AppService],

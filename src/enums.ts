@@ -3,3 +3,8 @@ export enum EmailTypes {
   PASSWORD_RECOVER = 'PASSWORD_RECOVER',
   INVITE_USER = 'INVITE_USER',
 }
+
+export enum CustomerTypes {
+  COMPANY = 'COMPANY',
+  PERSONAL = 'PERSONAL',
+}

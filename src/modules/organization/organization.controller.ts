@@ -20,7 +20,6 @@ export class OrganizationController {
   constructor(private readonly organizationService: OrganizationService) {}
 
   @Post('/create')
-  @HttpCode(HttpStatus.CREATED)
   @UseGuards(AuthGuard)
   async createOrganization(
     @Request() req,
@@ -34,7 +33,6 @@ export class OrganizationController {
   }
 
   @Get('/all')
-  @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard)
   async getAllOrganizations(@Request() req) {
     return this.organizationService.getAllOrganizations({
@@ -43,7 +41,6 @@ export class OrganizationController {
   }
 
   @Get('/by-slug/:slug')
-  @HttpCode(HttpStatus.OK)
   async getOrganizationBySlug(@Body() slug: string) {
     const organization =
       await this.organizationService.getOrganizationBySlug(slug);

@@ -22,7 +22,6 @@ model Customer {
   address        String        @map("address_description")
   createdAt      DateTime      @default(now()) @map("created_at")
   updatedAt      DateTime      @updatedAt @map("updated_at")
-  orders         Order[]
   organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   organizationId String        @map("organization_id")
 
@@ -123,8 +122,6 @@ model Member {
   user                User                @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId              String              @map("user_id")
   own_orders          Order[]
-  assigned_jobs       AssignedEmployee[]
-  assigned_comissions AssignedComission[]
 
   @@unique([organizationId, userId])
   @@map("members")
@@ -185,7 +182,6 @@ model ProductOrder {
   quantity  Int
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
   orderId   String   @map("order_id")
   product   Product  @relation(fields: [productId], references: [id])
   productId String   @map("product_id")
@@ -199,23 +195,12 @@ model ServiceOrder {
   quantity  Int
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
   orderId   String   @map("order_id")
   service   Service  @relation(fields: [serviceId], references: [id])
   serviceId String   @map("service_id")
 
   @@unique([orderId, serviceId])
   @@map("service_orders")
-}
-
-model AssignedEmployee {
-  id             String  @id @default(uuid())
-  employee       Member  @relation(fields: [employeeId], references: [id])
-  employeeId     String  @map("employee_id")
-  assigned_order Order[]
-
-  @@unique([id, employeeId])
-  @@map("assigned_employees")
 }
 
 enum OrderType {
@@ -226,9 +211,7 @@ enum OrderType {
 
 model Order {
   id              String         @id @default(uuid())
-  products_orders ProductOrder[]
-  service_orders  ServiceOrder[]
-  isHidden        Boolean        @default(false) @map("is_hidden")
+  isHidden        Boolean?        @default(false) @map("is_hidden")
   maxExployees    Int?           @default(1) @map("max_employees")
   createdAt       DateTime       @default(now()) @map("created_at")
   updatedAt       DateTime       @updatedAt @map("updated_at")
@@ -237,20 +220,15 @@ model Order {
   organizationId     String            @map("organization_id")
   member             Member            @relation(fields: [ownerId], references: [id])
   ownerId            String            @map("owner_id")
-  customer           Customer          @relation(fields: [customerId], references: [id])
-  customerId         String            @map("customer_id")
-  payment            Payment?          @relation(fields: [paymentId], references: [id])
-  paymentId          String            @map("payment_id")
-  assigned_employee  AssignedEmployee? @relation(fields: [assignedEmployeeId], references: [id])
-  assignedEmployeeId String            @map("assigned_employee_id")
-  comission          Comission?        @relation(fields: [comissionId], references: [id])
-  comissionId        String            @map("comission_id")
+  customer String
+  description String
   type               OrderType
+  value String 
+  payment PaymentType
+  comission String
 
-  @@unique([id, customerId])
   @@unique([id, ownerId])
   @@unique([id, organizationId])
-  @@unique([id, comissionId])
   @@map("orders")
 }
 
@@ -286,18 +264,6 @@ model Service {
   @@map("services")
 }
 
-model PaymentInstallment {
-  id        String   @id @default(uuid())
-  method    String
-  value     Float
-  dueDate   DateTime @map("due_date")
-  status    Boolean
-  payment   Payment  @relation(fields: [paymentId], references: [id], onDelete: Cascade)
-  paymentId String   @map("payment_id")
-
-  @@map("payment_installments")
-}
-
 enum PaymentType {
   PIX
   CARTAO
@@ -312,47 +278,6 @@ enum PaymentStatus {
   RECEIVED
   CANCELLED
 }
-
-model Payment {
-  id                   String               @id @default(uuid())
-  method               String
-  price                Float?
-  dueDay               Int?
-  installments         Int?
-  payment_installments PaymentInstallment[]
-  status               PaymentStatus        @default(PENDING)
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-  order     Order[]
-
-  @@map("payments")
-}
-
-model AssignedComission {
-  id          String    @id @default(uuid())
-  member      Member?   @relation(fields: [employeeId], references: [id], onDelete: Cascade)
-  employeeId  String?   @map("member_id")
-  comission   Comission @relation(fields: [comissionId], references: [id], onDelete: Cascade)
-  comissionId String    @map("comission_id")
-
-  @@unique([employeeId, comissionId])
-  @@unique([id, employeeId])
-  @@map("assigned_comissions")
-}
-
-model Comission {
-  id                  String              @id @default(uuid())
-  percentage          Float
-  assigned_comissions AssignedComission[]
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-  order     Order[]
-
-  @@map("comissions")
-}
-
 model BlingToken {
   id              String   @id @default(uuid())
   accessToken     String   @map("access_token")
