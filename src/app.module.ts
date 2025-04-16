@@ -16,6 +16,7 @@ import { BlingModule } from './modules/bling/bling.module';
 import { ServiceModule } from './modules/service/service.module';
 import { CustomerModule } from './modules/customer/customer.module';
 import { ComissionModule } from './modules/comission/comission.module';
+import { OrderModule } from './modules/order/order.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { ComissionModule } from './modules/comission/comission.module';
     ServiceModule,
     CustomerModule,
     ComissionModule,
+    OrderModule,
   ],
   controllers: [AppController],
   providers: [AppService],

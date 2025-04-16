@@ -14,17 +14,17 @@ import { ComissionService } from './comission.service';
 export class ComissionController {
   constructor(private readonly comissionService: ComissionService) {}
 
-  @Get('/by-order-id')
-  @UseGuards(AuthGuard)
-  findByOrderId(@Param('orderId') orderId: string) {
-    return this.comissionService.findByOrderId(orderId);
-  }
+  // @Get('/by-order-id')
+  // @UseGuards(AuthGuard)
+  // findByOrderId(@Param('orderId') orderId: string) {
+  //   return this.comissionService.findByOrderId(orderId);
+  // }
 
-  @Get('/all-me')
-  @UseGuards(AuthGuard)
-  async findByUserId(@Request() req) {
-    const userId = req.user.id;
+  // @Get('/all-me')
+  // @UseGuards(AuthGuard)
+  // async findByUserId(@Request() req) {
+  //   const userId = req.user.id;
 
-    return this.comissionService.findByUserId(userId);
-  }
+  //   return this.comissionService.findByUserId(userId);
+  // }
 }

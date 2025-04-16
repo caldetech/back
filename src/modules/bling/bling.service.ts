@@ -15,6 +15,28 @@ export class BlingService {
     private readonly blingRepository: BlingRepository,
   ) {}
 
+  async searchProducts({ slug, query }: { slug: string; query: string }) {
+    const tokens = await this.getValidAccessToken({ slug });
+
+    const products = await ky
+      .get('https://api.bling.com.br/Api/v3/produtos', {
+        searchParams: { nome: query.toString(), limite: 3 },
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          Accept: '1.0',
+          Authorization: `Bearer ${tokens.accessToken}`,
+        },
+      })
+      .json<BlingProductResponse>();
+
+    return products.data.map((item: BlingProduct) => ({
+      id: item.id,
+      nome: item.nome,
+      preco: item.preco,
+      precoCusto: item.precoCusto,
+    }));
+  }
+
   async getAuthorizeUrl({ slug }): Promise<{ url: string }> {
     const clientId = process.env.BLING_CLIENT_ID;
 
@@ -174,8 +196,6 @@ export class BlingService {
       preco: item.preco,
       precoCusto: item.precoCusto,
     }));
-
-    console.log(filteredData);
 
     return {
       data: filteredData,

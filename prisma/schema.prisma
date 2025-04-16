@@ -27,6 +27,7 @@ model Customer {
 
   @@unique([organizationId, document])
   @@map("customers")
+  Order Order[]
 }
 
 enum UserStatus {
@@ -125,6 +126,8 @@ model Member {
 
   @@unique([organizationId, userId])
   @@map("members")
+  AssignedMember AssignedMember[]
+  OrderCommission OrderCommission[]
 } 
 
 enum OrganizationStatus {
@@ -188,6 +191,7 @@ model ProductOrder {
 
   @@unique([orderId, productId])
   @@map("product_orders")
+  Order Order[]
 }
 
 model ServiceOrder {
@@ -201,35 +205,50 @@ model ServiceOrder {
 
   @@unique([orderId, serviceId])
   @@map("service_orders")
+  Order Order[]
 }
 
 enum OrderType {
   SALE
   BUDGET
   WARRANTY
-}
+} 
 
 model Order {
   id              String         @id @default(uuid())
-  isHidden        Boolean?        @default(false) @map("is_hidden")
-  maxExployees    Int?           @default(1) @map("max_employees")
   createdAt       DateTime       @default(now()) @map("created_at")
   updatedAt       DateTime       @updatedAt @map("updated_at")
+  organization    Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId  String         @map("organization_id")
+  owner          Member         @relation(fields: [ownerId], references: [id])
+  ownerId         String         @map("owner_id")
+  type            OrderType
+  customer Customer @relation(fields: [customerid], references: [id])
+  customerid String
 
-  organization       Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  organizationId     String            @map("organization_id")
-  member             Member            @relation(fields: [ownerId], references: [id])
-  ownerId            String            @map("owner_id")
-  customer String
-  description String
-  type               OrderType
-  value String 
-  payment PaymentType
-  comission String
+  productOrders   ProductOrder[]
+  serviceOrders   ServiceOrder[]
+  assignedMembers AssignedMember[]
+  payments        Payment[]
+  commissions     OrderCommission[]
+  OrderAttachment OrderAttachment[]
 
   @@unique([id, ownerId])
   @@unique([id, organizationId])
   @@map("orders")
+}
+
+model OrderAttachment {
+  id         String   @id @default(uuid())
+  order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId    String   @map("order_id")
+  filename   String   // Nome original do arquivo
+  url        String   // URL do S3
+  mimetype   String   // Ex: "application/pdf"
+  size       Int      // Em bytes
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@map("order_attachments")
 }
 
 model Product {
@@ -269,7 +288,7 @@ enum PaymentType {
   CARTAO
   BOLETO
   DINHEIRO
-  DEPÓSITO
+  DEPOSITO
   PENDENTE
 }
 
@@ -292,6 +311,46 @@ model BlingToken {
   @@unique([organizationId])
   @@map("bling_tokens")
 }
+
+model AssignedMember {
+  id        String   @id @default(uuid())
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId   String   @map("order_id")
+  member    Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  memberId  String   @map("member_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([orderId, memberId])
+  @@map("assigned_members")
+}
+
+model Payment {
+  id            String         @id @default(uuid())
+  order         Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId       String         @map("order_id")
+  amount        Float
+  method        PaymentType
+  status        PaymentStatus  @default(PENDING)
+  paidAt        DateTime?
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+
+  @@map("payments")
+}
+
+model OrderCommission {
+  id        String   @id @default(uuid())
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId   String   @map("order_id")
+  member    Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  memberId  String   @map("member_id")
+  amount    Float
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([orderId, memberId])
+  @@map("order_commissions")
+}
+
 
 
 

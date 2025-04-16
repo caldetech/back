@@ -6,37 +6,37 @@ import { PrismaService } from '../prisma/prisma.service';
 export class ComissionRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findByOrderId(orderId: string) {
-    return this.prisma.order.findUnique({
-      where: { id: orderId },
-      include: {
-        comission: {
-          include: {
-            assigned_comissions: {
-              include: {
-                member: {
-                  include: {
-                    user: true,
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    });
-  }
+  // async findByOrderId(orderId: string) {
+  //   return this.prisma.order.findUnique({
+  //     where: { id: orderId },
+  //     include: {
+  //       comission: {
+  //         include: {
+  //           assigned_comissions: {
+  //             include: {
+  //               member: {
+  //                 include: {
+  //                   user: true,
+  //                 },
+  //               },
+  //             },
+  //           },
+  //         },
+  //       },
+  //     },
+  //   });
+  // }
 
-  async findByUserId(userId: string) {
-    return this.prisma.assignedComission.findMany({
-      where: {
-        member: {
-          userId,
-        },
-      },
-      include: {
-        comission: true,
-      },
-    });
-  }
+  // async findByUserId(userId: string) {
+  //   return this.prisma.assignedComission.findMany({
+  //     where: {
+  //       member: {
+  //         userId,
+  //       },
+  //     },
+  //     include: {
+  //       comission: true,
+  //     },
+  //   });
+  // }
 }

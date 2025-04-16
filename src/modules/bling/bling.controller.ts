@@ -15,6 +15,14 @@ import { AuthGuard } from '../auth/auth.guard';
 export class BlingController {
   constructor(private readonly blingService: BlingService) {}
 
+  @Post('/search')
+  @UseGuards(AuthGuard)
+  async searchCProducts(
+    @Body() { slug, query }: { slug: string; query: string },
+  ) {
+    return this.blingService.searchProducts({ query, slug });
+  }
+
   @Post('/get-authorize-url')
   @UseGuards(AuthGuard)
   async getAuthorizeUrl(@Body() { slug }: { slug: string }) {

@@ -1,11 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import { Get, Injectable, Query, UseGuards } from '@nestjs/common';
 import { CustomerRepository } from './customer.repository';
 import { Customer } from 'src/schemas/customer';
 import { CustomerTypes } from 'src/enums';
+import { AuthGuard } from '../auth/auth.guard';
 
 @Injectable()
 export class CustomerService {
   constructor(private readonly customerRepository: CustomerRepository) {}
+
+  async searchCustomers({ slug, query }: { slug: string; query: string }) {
+    return this.customerRepository.searchCustomers({ query, slug });
+  }
 
   async createCustomer({
     slug,

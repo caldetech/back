@@ -5,6 +5,10 @@ import { MemberRepository } from './member.repository';
 export class MemberService {
   constructor(private readonly memberRepository: MemberRepository) {}
 
+  async searchMember({ slug, query }: { slug: string; query: string }) {
+    return this.memberRepository.searchMember({ query, slug });
+  }
+
   async getUserRoleInOrganization({
     userId,
     organizationId,

@@ -6,6 +6,36 @@ import { CustomerTypes } from 'src/enums';
 export class CustomerRepository {
   constructor(private readonly prisma: PrismaService) {}
 
+  async searchCustomers({ query, slug }: { query: string; slug: string }) {
+    try {
+      const customers = await this.prisma.customer.findMany({
+        where: {
+          organization: {
+            slug,
+          },
+          name: {
+            contains: query,
+            mode: 'insensitive',
+          },
+        },
+        take: 3,
+        orderBy: { name: 'asc' },
+        select: {
+          id: true,
+          customerType: true,
+          name: true,
+          mainNumber: true,
+          contactNumber: true,
+          address: true,
+        },
+      });
+
+      return customers;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   async createCustomer({
     slug,
     customerType,

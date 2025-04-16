@@ -8,6 +8,14 @@ import { CustomerTypes } from 'src/enums';
 export class CustomerController {
   constructor(private readonly customerService: CustomerService) {}
 
+  @Post('/search')
+  @UseGuards(AuthGuard)
+  async searchCustomers(
+    @Body() { slug, query }: { slug: string; query: string },
+  ) {
+    return this.customerService.searchCustomers({ query, slug });
+  }
+
   @Post('/create')
   @UseGuards(AuthGuard)
   async createCustomer(

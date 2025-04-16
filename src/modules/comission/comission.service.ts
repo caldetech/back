@@ -5,11 +5,11 @@ import { ComissionRepository } from './comission.repository';
 export class ComissionService {
   constructor(private readonly comissionRepository: ComissionRepository) {}
 
-  findByOrderId(orderId: string) {
-    return this.comissionRepository.findByOrderId(orderId);
-  }
+  // findByOrderId(orderId: string) {
+  //   return this.comissionRepository.findByOrderId(orderId);
+  // }
 
-  findByUserId(userId: string) {
-    return this.comissionRepository.findByUserId(userId);
-  }
+  // findByUserId(userId: string) {
+  //   return this.comissionRepository.findByUserId(userId);
+  // }
 }
