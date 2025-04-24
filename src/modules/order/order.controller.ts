@@ -9,6 +9,7 @@ import {
   Request,
   UseGuards,
   BadRequestException,
+  Query,
 } from '@nestjs/common';
 import { AuthGuard } from '../auth/auth.guard';
 import { OrganizationService } from '../organization/organization.service';
@@ -24,6 +25,20 @@ export class OrderController {
     private readonly prisma: PrismaService,
   ) {}
 
+  @Get('/all')
+  @UseGuards(AuthGuard)
+  async getOrders(
+    @Query('page') page: number,
+    @Query('limit') limit: number,
+    @Query('slug') slug: string,
+  ) {
+    return await this.orderService.getOrders({
+      page,
+      limit,
+      slug,
+    });
+  }
+
   @Post('/create')
   @UseGuards(AuthGuard)
   async createOrder(
@@ -34,7 +49,7 @@ export class OrderController {
       type,
       paymentMethod,
       paymentAmount,
-      products,
+      blingProducts,
       members,
       commissionPercent,
       memberCommissions,
@@ -44,7 +59,7 @@ export class OrderController {
       type: OrderTypes;
       paymentMethod: paymentMethodTypes;
       paymentAmount?: number;
-      products: {
+      blingProducts: {
         id: string;
         nome: string;
         preco: number;
@@ -71,7 +86,7 @@ export class OrderController {
       type,
       paymentMethod,
       paymentAmount,
-      products,
+      blingProducts,
       members,
       commissionPercent,
       memberCommissions,

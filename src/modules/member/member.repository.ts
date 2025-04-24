@@ -25,9 +25,26 @@ export class MemberRepository {
         },
         take: 3,
         orderBy: { name: 'asc' },
+        include: {
+          member_on: {
+            where: {
+              organization: {
+                slug,
+              },
+            },
+            select: {
+              id: true,
+            },
+          },
+        },
       });
 
-      return members;
+      return members.map((element) => {
+        return {
+          name: element.name,
+          id: element.member_on[0].id,
+        };
+      });
     } catch (error) {
       console.log(error);
     }

@@ -6,9 +6,10 @@ import { OrganizationModule } from '../organization/organization.module';
 import { CustomerModule } from '../customer/customer.module';
 import { MemberModule } from '../member/member.module';
 import { OrderRepository } from './order.repository';
+import { ProductModule } from '../product/product.module';
 
 @Module({
-  imports: [OrganizationModule, CustomerModule, MemberModule],
+  imports: [OrganizationModule, CustomerModule, MemberModule, ProductModule],
   controllers: [OrderController],
   providers: [OrderService, PrismaService, OrderRepository],
 })

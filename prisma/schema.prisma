@@ -185,27 +185,14 @@ model ProductOrder {
   quantity  Int
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-  orderId   String   @map("order_id")
-  product   Product  @relation(fields: [productId], references: [id])
-  productId String   @map("product_id")
+  order Order @relation(fields: [orderid], references: [id], onDelete: Cascade)
+  orderid String
+  product Product? @relation(fields: [productid], references: [id], onDelete: SetNull)
+  productid String?
 
-  @@unique([orderId, productId])
+  @@unique([orderid, productid])
+  @@unique([id, orderid])
   @@map("product_orders")
-  Order Order[]
-}
-
-model ServiceOrder {
-  id        String   @id @default(uuid())
-  quantity  Int
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-  orderId   String   @map("order_id")
-  service   Service  @relation(fields: [serviceId], references: [id])
-  serviceId String   @map("service_id")
-
-  @@unique([orderId, serviceId])
-  @@map("service_orders")
-  Order Order[]
 }
 
 enum OrderType {
@@ -214,25 +201,35 @@ enum OrderType {
   WARRANTY
 } 
 
+enum OrderStatus {
+  OPEN
+  CLOSED
+  CANCELLED
+}
+
 model Order {
   id              String         @id @default(uuid())
   createdAt       DateTime       @default(now()) @map("created_at")
   updatedAt       DateTime       @updatedAt @map("updated_at")
   organization    Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   organizationId  String         @map("organization_id")
-  owner          Member         @relation(fields: [ownerId], references: [id])
-  ownerId         String         @map("owner_id")
+  owner          Member?         @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+  ownerId         String?         @map("owner_id")
   type            OrderType
+  status OrderStatus @default(OPEN)
+
   customer Customer @relation(fields: [customerid], references: [id])
   customerid String
 
-  productOrders   ProductOrder[]
-  serviceOrders   ServiceOrder[]
+  payment        Payment? @relation(fields: [paymentid], references: [id])
+  paymentid String? @map("payment_id") @unique
+
+  productOrder ProductOrder[]
   assignedMembers AssignedMember[]
-  payments        Payment[]
   commissions     OrderCommission[]
   OrderAttachment OrderAttachment[]
 
+  @@unique([id, paymentid])
   @@unique([id, ownerId])
   @@unique([id, organizationId])
   @@map("orders")
@@ -240,8 +237,8 @@ model Order {
 
 model OrderAttachment {
   id         String   @id @default(uuid())
-  order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  orderId    String   @map("order_id")
+  order      Order?    @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  orderId    String?   @map("order_id")
   filename   String   // Nome original do arquivo
   url        String   // URL do S3
   mimetype   String   // Ex: "application/pdf"
@@ -253,18 +250,16 @@ model OrderAttachment {
 
 model Product {
   id          String   @id @default(uuid())
-  title       String
-  description String?
-  costPrice   Float    @map("cost_price")
-  salesPrice  Float    @map("sales_price")
-  stock       Int
+  nome       String
+  blingId BigInt @unique 
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
   organization   Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   organizationId String         @map("organization_id")
-  product_order  ProductOrder[]
+  productOrder ProductOrder[]
 
+  @@unique([organizationId, blingId])
   @@map("products")
 }
 
@@ -278,7 +273,6 @@ model Service {
 
   organization   Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   organizationId String         @map("organization_id")
-  service_order  ServiceOrder[]
 
   @@map("services")
 }
@@ -326,14 +320,14 @@ model AssignedMember {
 
 model Payment {
   id            String         @id @default(uuid())
-  order         Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  orderId       String         @map("order_id")
   amount        Float
   method        PaymentType
   status        PaymentStatus  @default(PENDING)
   paidAt        DateTime?
   createdAt     DateTime       @default(now()) @map("created_at")
   updatedAt     DateTime       @updatedAt @map("updated_at")
+
+  Order Order[]
 
   @@map("payments")
 }

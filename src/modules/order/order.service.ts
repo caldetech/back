@@ -2,20 +2,41 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { CustomerTypes, OrderTypes, paymentMethodTypes } from 'src/enums';
 import { OrderRepository } from './order.repository';
 import { OrganizationService } from '../organization/organization.service';
+import { ProductService } from '../product/product.service';
 
 @Injectable()
 export class OrderService {
   constructor(
     private readonly orderRepository: OrderRepository,
     private readonly organizationService: OrganizationService,
+    private readonly productService: ProductService,
   ) {}
+
+  async getOrders({
+    page,
+    limit,
+    slug,
+  }: {
+    page: number;
+    limit: number;
+    slug: string;
+  }) {
+    const numericPage = Number(page);
+    const numericLimit = Number(limit);
+
+    return await this.orderRepository.getOrders({
+      page: numericPage,
+      limit: numericLimit,
+      slug,
+    });
+  }
 
   async createOrder({
     slug,
     type,
     paymentMethod,
     paymentAmount,
-    products,
+    blingProducts,
     members,
     commissionPercent,
     memberCommissions,
@@ -26,7 +47,7 @@ export class OrderService {
     type: OrderTypes;
     paymentMethod: paymentMethodTypes;
     paymentAmount?: number;
-    products: {
+    blingProducts: {
       id: string;
       nome: string;
       preco: number;
@@ -53,12 +74,22 @@ export class OrderService {
       throw new BadRequestException('Organização não encontrada');
     }
 
+    const storedProducts = await this.productService.createProducts({
+      slug,
+      blingProducts,
+    });
+
+    if (!storedProducts) {
+      throw new BadRequestException('Erro ao armazenar produtos do Bling');
+    }
+
     return this.orderRepository.createOrder({
       slug,
       type,
       paymentMethod,
       paymentAmount,
-      products,
+      blingProducts,
+      storedProducts,
       members,
       commissionPercent,
       memberCommissions,
