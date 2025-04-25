@@ -227,7 +227,7 @@ model Order {
   productOrder ProductOrder[]
   assignedMembers AssignedMember[]
   commissions     OrderCommission[]
-  OrderAttachment OrderAttachment[]
+  orderAttachment OrderAttachment[]
 
   @@unique([id, paymentid])
   @@unique([id, ownerId])
@@ -238,9 +238,9 @@ model Order {
 model OrderAttachment {
   id         String   @id @default(uuid())
   order      Order?    @relation(fields: [orderId], references: [id], onDelete: SetNull)
-  orderId    String?   @map("order_id")
+  orderId    String?   @map("order_id") @unique
   filename   String   // Nome original do arquivo
-  url        String   // URL do S3
+  url        String   // URL do S3 
   mimetype   String   // Ex: "application/pdf"
   size       Int      // Em bytes
   createdAt  DateTime @default(now()) @map("created_at")

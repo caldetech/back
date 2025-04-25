@@ -13,7 +13,27 @@ export class AttachmentRepository {
     this.bucket = this.config.get<string>('AWS_BUCKET_NAME')!;
   }
 
-  async confirmUpload(fileData: {
+  async getAttachmentById({ id }: { id: string }) {
+    try {
+      const attachment = await this.prisma.orderAttachment.findUnique({
+        where: {
+          id,
+        },
+      });
+
+      return attachment;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async confirmUpload({
+    orderId,
+    filename,
+    mimetype,
+    size,
+    key,
+  }: {
     orderId: string;
     filename: string;
     mimetype: string;
@@ -21,14 +41,25 @@ export class AttachmentRepository {
     key: string;
   }) {
     try {
-      const attachment = await this.prisma.orderAttachment.create({
-        data: {
-          filename: fileData.filename,
-          url: `https://${this.bucket}.s3.amazonaws.com/${fileData.key}`,
-          mimetype: fileData.mimetype,
-          size: fileData.size,
+      const attachment = await this.prisma.orderAttachment.upsert({
+        where: {
+          orderId,
+        },
+        update: {
+          filename,
+          url: `https://${this.bucket}.s3.amazonaws.com/${key}`,
+          mimetype,
+          size,
+        },
+        create: {
+          filename,
+          url: `https://${this.bucket}.s3.amazonaws.com/${key}`,
+          mimetype,
+          size,
           order: {
-            connect: { id: fileData.orderId },
+            connect: {
+              id: orderId,
+            },
           },
         },
       });

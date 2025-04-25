@@ -1,5 +1,4 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
 import { ConfigService } from '@nestjs/config';
 import {
   HeadObjectCommand,
@@ -17,11 +16,14 @@ export class AttachmentService {
 
   constructor(
     private readonly attachmentRepository: AttachmentRepository,
-    private readonly prisma: PrismaService,
     private readonly config: ConfigService,
     private readonly s3: S3Client,
   ) {
     this.bucket = this.config.get<string>('AWS_BUCKET_NAME')!;
+  }
+
+  async getAttachmentById({ id }: { id: string }) {
+    return this.attachmentRepository.getAttachmentById({ id });
   }
 
   async getSignedUploadUrl(fileData: { filename: string; mimetype: string }) {
@@ -42,7 +44,13 @@ export class AttachmentService {
     };
   }
 
-  async confirmUpload(fileData: {
+  async confirmUpload({
+    orderId,
+    filename,
+    mimetype,
+    size,
+    key,
+  }: {
     orderId: string;
     filename: string;
     mimetype: string;
@@ -51,12 +59,18 @@ export class AttachmentService {
   }) {
     try {
       await this.s3.send(
-        new HeadObjectCommand({ Bucket: this.bucket, Key: fileData.key }),
+        new HeadObjectCommand({ Bucket: this.bucket, Key: key }),
       );
-    } catch {
+    } catch (e) {
       throw new NotFoundException('Arquivo não encontrado no S3.');
     }
 
-    return await this.attachmentRepository.confirmUpload(fileData);
+    return await this.attachmentRepository.confirmUpload({
+      orderId,
+      filename,
+      mimetype,
+      size,
+      key,
+    });
   }
 }

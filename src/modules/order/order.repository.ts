@@ -163,6 +163,7 @@ export class OrderRepository {
               status: true,
             },
           },
+          orderAttachment: true,
         },
       });
 
@@ -188,6 +189,17 @@ export class OrderRepository {
           })
           .nullable(),
         status: z.string(),
+        orderAttachment: z.array(
+          z.object({
+            id: z.string(),
+            orderId: z.string(),
+            filename: z.string(),
+            url: z.string(),
+            mimetype: z.string(),
+            size: z.number(),
+            createdAt: z.date(),
+          }),
+        ),
       });
 
       const orderDTOSchema = rawOrderSchema.transform((order) => ({
@@ -196,6 +208,7 @@ export class OrderRepository {
         customer: order.customer?.name ?? null,
         payment: order.payment?.status ?? null,
         status: order.status,
+        orderAttachment: order.orderAttachment,
       }));
 
       const filteredOrders = orders.map((order) => orderDTOSchema.parse(order));
