@@ -33,7 +33,7 @@ export const permissions: Record<Role, PermissionsByRole> = {
     can('manage', 'Billing');
     cannot('manage', [
       'Payment',
-      'Comission',
+      'Commission',
       'Dashboard',
       'Report',
       'Order',
@@ -45,7 +45,7 @@ export const permissions: Record<Role, PermissionsByRole> = {
   MANAGER(_, { can }) {
     can('manage', [
       'Payment',
-      'Comission',
+      'Commission',
       'User',
       'Order',
       'Product',

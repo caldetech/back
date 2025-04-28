@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { createMongoAbility, MongoAbility, CreateAbility } from '@casl/ability';
 import { projectSubject } from '../subjects/project';
 import { billingSubject } from '../subjects/billing';
-import { comissionSubject } from '../subjects/comission';
+import { commissionsubject } from '../subjects/commission';
 import { dashboardSubject } from '../subjects/dashboard';
 import { paymentSubject } from '../subjects/payment';
 import { productSubject } from '../subjects/product';
@@ -17,7 +17,7 @@ import { inviteSubject } from '../subjects/invite';
 export const appAbilitiesSchema = z.union([
   projectSubject,
   billingSubject,
-  comissionSubject,
+  commissionsubject,
   dashboardSubject,
   paymentSubject,
   productSubject,

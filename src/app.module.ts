@@ -15,7 +15,7 @@ import { ResendModule } from './modules/resend/resend.module';
 import { BlingModule } from './modules/bling/bling.module';
 import { ServiceModule } from './modules/service/service.module';
 import { CustomerModule } from './modules/customer/customer.module';
-import { ComissionModule } from './modules/comission/comission.module';
+import { CommissionModule } from './modules/commission/commission.module';
 import { OrderModule } from './modules/order/order.module';
 import { ProductModule } from './modules/product/product.module';
 import { AttachmentModule } from './modules/attachment/attachment.module';
@@ -41,7 +41,7 @@ import { ConfigModule } from '@nestjs/config';
     BlingModule,
     ServiceModule,
     CustomerModule,
-    ComissionModule,
+    CommissionModule,
     OrderModule,
     ProductModule,
     AttachmentModule,
