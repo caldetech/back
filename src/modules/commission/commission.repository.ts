@@ -33,7 +33,7 @@ export class CommissionRepository {
           memberId: true,
           orderId: true,
           amount: true,
-
+          createdAt: true,
           member: {
             select: {
               user: {
@@ -59,6 +59,7 @@ export class CommissionRepository {
       const commissionSchema = z.object({
         id: z.string(),
         amount: z.number(),
+        createdAt: z.date(),
         member: z.object({
           user: z.object({
             name: z.string(),
@@ -72,6 +73,7 @@ export class CommissionRepository {
         id: commission.id,
         member: commission.member?.user?.name ?? null,
         amount: commission.amount,
+        createdAt: commission.createdAt,
         memberId: commission.memberId ?? null,
         orderId: commission.orderId,
       }));

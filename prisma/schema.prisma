@@ -24,10 +24,10 @@ model Customer {
   updatedAt      DateTime      @updatedAt @map("updated_at")
   organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   organizationId String        @map("organization_id")
+  Order Order[]
 
   @@unique([organizationId, document])
   @@map("customers")
-  Order Order[]
 }
 
 enum UserStatus {
@@ -218,7 +218,7 @@ model Order {
   type            OrderType
   status OrderStatus @default(OPEN)
 
-  customer Customer @relation(fields: [customerid], references: [id])
+  customer Customer @relation(fields: [customerid], references: [id], onDelete: SetNull)
   customerid String
 
   payment        Payment? @relation(fields: [paymentid], references: [id])
