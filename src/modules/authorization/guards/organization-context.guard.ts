@@ -17,7 +17,11 @@ export class OrganizationContextGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const slug = request.body.slug;
+    const query = { ...request.query };
+    const body = { ...request.body };
+    const querySlug = query.slug;
+    const bodySlug = body.slug;
+    const slug = querySlug || bodySlug;
     const user = request.user;
     const organization =
       await this.organizationService.getOrganizationBySlug(slug);

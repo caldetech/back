@@ -29,8 +29,6 @@ export class PoliciesGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const user = request.user;
 
-    console.log('User in PoliciesGuard:', user);
-
     const ability = this.caslAbilityFactory.createForUser(user);
 
     const isAllowed = handlers.every((handler) =>
@@ -38,9 +36,7 @@ export class PoliciesGuard implements CanActivate {
     );
 
     if (!isAllowed) {
-      throw new ForbiddenException(
-        'You are not allowed to perform this action.',
-      );
+      throw new ForbiddenException('Você não pode executar esta ação!');
     }
 
     return true;

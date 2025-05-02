@@ -218,8 +218,8 @@ model Order {
   type            OrderType
   status OrderStatus @default(OPEN)
 
-  customer Customer @relation(fields: [customerid], references: [id], onDelete: SetNull)
-  customerid String
+  customer Customer? @relation(fields: [customerid], references: [id], onDelete: SetNull)
+  customerid String?
 
   payment        Payment? @relation(fields: [paymentid], references: [id])
   paymentid String? @map("payment_id") @unique

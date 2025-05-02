@@ -11,7 +11,9 @@ export class CaslAbilityFactory {
     const rolePermissions = permissions[user.organizationRole.role];
 
     if (typeof rolePermissions !== 'function') {
-      throw new Error(`No permissions defined for role: ${user.role}`);
+      throw new Error(
+        `No permissions defined for role: ${user.organizationRole.role}`,
+      );
     }
 
     rolePermissions(user, builder);

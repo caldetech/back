@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const commissionSubject = z.tuple([
+export const blingSubject = z.tuple([
   z.union([
     z.literal('manage'),
     z.literal('get'),
@@ -8,7 +8,7 @@ export const commissionSubject = z.tuple([
     z.literal('delete'),
     z.literal('create'),
   ]),
-  z.literal('Commission'),
+  z.literal('Bling'),
 ]);
 
-export type CommissionSubject = z.infer<typeof commissionSubject>;
+export type BlingSubject = z.infer<typeof blingSubject>;
