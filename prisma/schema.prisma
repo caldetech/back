@@ -185,7 +185,7 @@ model ProductOrder {
   quantity  Int
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-  order Order @relation(fields: [orderid], references: [id], onDelete: Cascade)
+  order Order @relation(fields: [orderid], references: [id], onDelete: Cascade) 
   orderid String
   product Product? @relation(fields: [productid], references: [id], onDelete: SetNull)
   productid String?
