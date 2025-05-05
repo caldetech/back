@@ -4,16 +4,23 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  NotFoundException,
   Post,
   Request,
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from './auth.guard';
+import { MemberService } from '../member/member.service';
+import { OrganizationService } from '../organization/organization.service';
 
 @Controller('/auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly memberService: MemberService,
+    private readonly organizationService: OrganizationService,
+  ) {}
 
   @HttpCode(HttpStatus.OK)
   @Post('/log-in')
@@ -25,8 +32,30 @@ export class AuthController {
   }
 
   @UseGuards(AuthGuard)
-  @Get('/profile')
-  getProfile(@Request() req) {
-    return req.user;
+  @Post('/profile')
+  async getProfile(@Request() req, @Body() { slug }: { slug: string }) {
+    const user = req.user;
+
+    const organization =
+      await this.organizationService.getOrganizationBySlug(slug);
+
+    if (!organization) {
+      throw new NotFoundException('Organização não encontrada');
+    }
+
+    const membership = await this.memberService.getUserRoleInOrganization({
+      userId: user.id,
+      organizationId: organization.id,
+    });
+
+    if (!membership) {
+      throw new NotFoundException('Membro não encontrado');
+    }
+
+    return {
+      ...req.user,
+      membership: membership.id,
+      role: membership.role,
+    };
   }
 }
