@@ -21,8 +21,7 @@ export const EmailTemplate = ({
   <>
     {type === EmailTypes.INVITE_USER && (
       <div>
-        <p>Olá,</p>
-        <p>Você foi convidado(a) para ingressar na equipe:</p>
+        <p>Olá, você foi convidado(a) para ingressar na equipe Caldetech:</p>
         <a href={`${process.env.FRONT_END}/cadastrar?inviteId=${inviteId}`}>
           Clique aqui para se cadastrar
         </a>
@@ -31,8 +30,7 @@ export const EmailTemplate = ({
 
     {type === EmailTypes.CONFIRM_ACCOUNT && (
       <div>
-        <p>Olá {name},</p>
-        <p>Confirme sua conta para acessar a plataforma:</p>
+        <p>Olá {name}, confirme sua conta para acessar a plataforma:</p>
         <a href={`${process.env.FRONT_END}/confirmar-conta?tokenId=${tokenId}`}>
           Clique aqui para confirmar sua conta
         </a>

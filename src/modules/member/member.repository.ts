@@ -7,6 +7,49 @@ import type { Role } from 'src/schemas/role';
 export class MemberRepository {
   constructor(private readonly prisma: PrismaService) {}
 
+  async searchMember({ query, slug }: { query: string; slug: string }) {
+    try {
+      const members = await this.prisma.user.findMany({
+        where: {
+          member_on: {
+            some: {
+              organization: {
+                slug,
+              },
+            },
+          },
+          name: {
+            contains: query,
+            mode: 'insensitive',
+          },
+        },
+        take: 3,
+        orderBy: { name: 'asc' },
+        include: {
+          member_on: {
+            where: {
+              organization: {
+                slug,
+              },
+            },
+            select: {
+              id: true,
+            },
+          },
+        },
+      });
+
+      return members.map((element) => {
+        return {
+          name: element.name,
+          id: element.member_on[0].id,
+        };
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   async getUserRoleInOrganization({
     userId,
     organizationId,

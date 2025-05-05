@@ -10,30 +10,25 @@ type PermissionsByRole = (
 ) => void;
 
 export const permissions: Record<Role, PermissionsByRole> = {
-  ADMIN(user, { can, cannot }) {
+  ADMIN(_, { can, cannot }) {
     can('manage', 'all');
     cannot(['transfer_ownership', 'update'], 'Organization');
-    can(['transfer_ownership', 'update'], 'Organization', {
-      ownerId: { $eq: user.id },
-    });
+    can(['transfer_ownership', 'update'], 'Organization');
   },
-  MEMBER(user, { can }) {
-    can('get', 'User');
+  MEMBER(_, { can }) {
     can(['create', 'get'], 'Project');
-    can(['update', 'delete'], 'Project', { ownerId: { $eq: user.id } });
-    can('manage', 'Order', {
-      ownerId: { $eq: user.id },
-    });
-    can('get', 'Order', {
-      isHidden: false,
-    });
-    can('get', ['Product', 'Service']);
+    can(['update', 'delete'], 'Project');
+    can('manage', 'Order');
+    can('get', 'Order');
+    can('get', ['Product', 'Service', 'User']);
+    can('manage', 'Bling');
+    can('manage', 'Commission');
   },
   BILLING(_, { can, cannot }) {
     can('manage', 'Billing');
     cannot('manage', [
       'Payment',
-      'Comission',
+      'Commission',
       'Dashboard',
       'Report',
       'Order',
@@ -41,15 +36,17 @@ export const permissions: Record<Role, PermissionsByRole> = {
       'Service',
     ]);
     can('get', 'User');
+    can('manage', 'Bling');
   },
   MANAGER(_, { can }) {
     can('manage', [
       'Payment',
-      'Comission',
+      'Commission',
       'User',
       'Order',
       'Product',
       'Service',
+      'Bling',
     ]);
   },
 };

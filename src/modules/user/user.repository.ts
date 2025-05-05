@@ -121,13 +121,30 @@ export class UserRepository {
     }
   }
 
-  async getUsers({ page, limit }: { page: number; limit: number }) {
+  async getUsers({
+    page,
+    limit,
+    slug,
+  }: {
+    page: number;
+    limit: number;
+    slug: string;
+  }) {
     try {
       const skip = (page - 1) * limit;
 
       const users = await this.prisma.user.findMany({
         skip,
         take: limit,
+        where: {
+          member_on: {
+            some: {
+              organization: {
+                slug,
+              },
+            },
+          },
+        },
         select: {
           id: true,
           name: true,
@@ -136,7 +153,17 @@ export class UserRepository {
         },
       });
 
-      const total = await this.prisma.user.count();
+      const total = await this.prisma.user.count({
+        where: {
+          member_on: {
+            some: {
+              organization: {
+                slug,
+              },
+            },
+          },
+        },
+      });
 
       return {
         data: users,

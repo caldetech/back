@@ -3,3 +3,23 @@ export enum EmailTypes {
   PASSWORD_RECOVER = 'PASSWORD_RECOVER',
   INVITE_USER = 'INVITE_USER',
 }
+
+export enum CustomerTypes {
+  COMPANY = 'COMPANY',
+  PERSONAL = 'PERSONAL',
+}
+
+export enum OrderTypes {
+  SALE = 'SALE',
+  BUDGET = 'BUDGET',
+  WARRANTY = 'WARRANTY',
+}
+
+export enum paymentMethodTypes {
+  PIX = 'PIX',
+  CARTAO = 'CARTAO',
+  BOLETO = 'BOLETO',
+  DINHEIRO = 'DINHEIRO',
+  DEPOSITO = 'DEPOSITO',
+  PENDENTE = 'PENDENTE',
+}

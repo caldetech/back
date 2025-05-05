@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from 'zod';
 
 export const userSubject = z.tuple([
   z.union([
@@ -6,8 +6,9 @@ export const userSubject = z.tuple([
     z.literal('get'),
     z.literal('update'),
     z.literal('delete'),
+    z.literal('create'),
   ]),
   z.literal('User'),
-])
+]);
 
-export type UserSubject = z.infer<typeof userSubject>
+export type UserSubject = z.infer<typeof userSubject>;

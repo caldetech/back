@@ -16,7 +16,7 @@ export class OrganizationService {
       throw new UnauthorizedException('Essa organização já existe');
     }
 
-    return this.organizationRepository.createOrganization({
+    return await this.organizationRepository.createOrganization({
       name,
       slug,
       userId,
@@ -24,10 +24,10 @@ export class OrganizationService {
   }
 
   async getAllOrganizations({ userId }: { userId: string }) {
-    return this.organizationRepository.getAllOrganizations({ userId });
+    return await this.organizationRepository.getAllOrganizations({ userId });
   }
 
   async getOrganizationBySlug(slug: string) {
-    return this.organizationRepository.getOrganizationBySlug(slug);
+    return await this.organizationRepository.getOrganizationBySlug(slug);
   }
 }

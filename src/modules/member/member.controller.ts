@@ -1,9 +1,16 @@
-import { Controller } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { MemberService } from './member.service';
+import { AuthGuard } from '../auth/auth.guard';
 
-@Controller('member')
+@Controller('/members')
 export class MemberController {
   constructor(private readonly memberService: MemberService) {}
+
+  @Post('/search')
+  @UseGuards(AuthGuard)
+  async searchMember(@Body() { slug, query }: { slug: string; query: string }) {
+    return this.memberService.searchMember({ query, slug });
+  }
 
   async getUserRoleInOrganization({
     userId,

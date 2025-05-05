@@ -3,6 +3,10 @@ import ky from 'ky';
 import { BlingTokensSchema } from 'src/schemas/bling-tokens';
 import { OrganizationService } from '../organization/organization.service';
 import { BlingRepository } from './bling.repository';
+import type {
+  BlingProduct,
+  BlingProductResponse,
+} from 'src/schemas/bling-product';
 
 @Injectable()
 export class BlingService {
@@ -10,6 +14,28 @@ export class BlingService {
     private readonly organizationService: OrganizationService,
     private readonly blingRepository: BlingRepository,
   ) {}
+
+  async searchProducts({ slug, query }: { slug: string; query: string }) {
+    const tokens = await this.getValidAccessToken({ slug });
+
+    const products = await ky
+      .get('https://api.bling.com.br/Api/v3/produtos', {
+        searchParams: { nome: query.toString(), limite: 3 },
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          Accept: '1.0',
+          Authorization: `Bearer ${tokens.accessToken}`,
+        },
+      })
+      .json<BlingProductResponse>();
+
+    return products.data.map((item: BlingProduct) => ({
+      id: item.id,
+      nome: item.nome,
+      preco: item.preco,
+      precoCusto: item.precoCusto,
+    }));
+  }
 
   async getAuthorizeUrl({ slug }): Promise<{ url: string }> {
     const clientId = process.env.BLING_CLIENT_ID;
@@ -148,14 +174,31 @@ export class BlingService {
     return token;
   }
 
-  async getProducts({ accessToken, page = 1, limit = 5 }) {
-    const response = await ky.get('https://api.bling.com.br/Api/v3/produtos', {
-      searchParams: { pagina: page.toString(), limite: limit.toString() },
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
+  async getProducts({
+    accessToken,
+    page = 1,
+    limit = 5,
+  }): Promise<BlingProductResponse> {
+    const response = await ky
+      .get('https://api.bling.com.br/Api/v3/produtos', {
+        searchParams: { pagina: page.toString(), limite: limit },
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          Accept: '1.0',
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+      .json<BlingProductResponse>();
 
-    return response.json();
+    const filteredData = response.data.map((item: BlingProduct) => ({
+      id: item.id,
+      nome: item.nome,
+      preco: item.preco,
+      precoCusto: item.precoCusto,
+    }));
+
+    return {
+      data: filteredData,
+    };
   }
 }
