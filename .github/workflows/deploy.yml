@@ -47,7 +47,7 @@ jobs:
           version_label: ${{ github.sha }}-${{ github.run_attempt }}
           region: us-east-1
           deployment_package: deploy.zip
-          use_existing_version_if_available: true
+          use_existing_version_if_available: false
           wait_for_deployment: true
           wait_for_environment_recovery: 60
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
