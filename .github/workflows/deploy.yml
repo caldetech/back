@@ -22,12 +22,6 @@ jobs:
       - name: 🚀 Push da imagem Docker
         run: docker push caldetech/management-system_back:latest
 
-      - name: 📦 Zipar o Dockerrun.aws.json
-        run: zip -r deploy.zip Dockerrun.aws.json
-
-      - name: 🔍 Listar arquivos para debug
-        run: ls -la
-
       - name: ⏳ Esperar imagem no DockerHub
         run: |
           for i in {1..10}; do
