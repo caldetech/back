@@ -31,4 +31,5 @@ COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 # COPY .env .env
 
 EXPOSE 3333
-CMD ["node", "dist/main"]
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/main"]
+
