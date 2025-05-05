@@ -1,13 +1,11 @@
 {
-  "AWSEBDockerrunVersion": 1,
   "Image": {
     "Name": "caldetech/management-system_back:latest",
     "Update": "true"
   },
   "Ports": [
     {
-      "ContainerPort": 3333
+      "ContainerPort": "3333"
     }
-  ],
-  "Logging": "/var/log/app"
+  ]
 }
