@@ -28,11 +28,22 @@ jobs:
       - name: 🔍 Listar arquivos para debug
         run: ls -la
 
+      - name: ⏳ Esperar imagem no DockerHub
+        run: |
+          for i in {1..10}; do
+            if docker pull caldetech/management-system_back:latest; then
+              echo "Imagem disponível!"
+              break
+            fi
+            echo "Aguardando imagem..."
+            sleep 10
+          done
+
       - name: 🚀 Deploy no Elastic Beanstalk
         uses: einaregilsson/beanstalk-deploy@v22
         with:
           application_name: management-system_back
-          environment_name: back-end
+          environment_name: back
           version_label: ${{ github.sha }}-${{ github.run_attempt }}
           region: us-east-1
           deployment_package: deploy.zip
