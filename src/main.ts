@@ -15,7 +15,12 @@ async function bootstrap() {
   );
 
   app.enableCors({
-    origin: ['http://localhost:3000', 'https://gestao.caldetech.com.br'],
+    origin: [
+      'http://localhost:3000',
+      'https://gestao.caldetech.com.br',
+      'http://gestao.caldetech.com.br',
+    ],
+    credentials: true,
   });
 
   app.register(fastifyStatic, {
