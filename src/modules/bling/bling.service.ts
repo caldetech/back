@@ -18,23 +18,30 @@ export class BlingService {
   async searchProducts({ slug, query }: { slug: string; query: string }) {
     const tokens = await this.getValidAccessToken({ slug });
 
-    const products = await ky
-      .get('https://api.bling.com.br/Api/v3/produtos', {
-        searchParams: { nome: query.toString(), limite: 3 },
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          Accept: '1.0',
-          Authorization: `Bearer ${tokens.accessToken}`,
-        },
-      })
-      .json<BlingProductResponse>();
+    if ('accessToken' in tokens) {
+      const products = await ky
+        .get('https://api.bling.com.br/Api/v3/produtos', {
+          searchParams: { nome: query.toString(), limite: 3 },
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            Accept: '1.0',
+            Authorization: `Bearer ${tokens.accessToken}`,
+          },
+        })
+        .json<BlingProductResponse>();
 
-    return products.data.map((item: BlingProduct) => ({
-      id: item.id,
-      nome: item.nome,
-      preco: item.preco,
-      precoCusto: item.precoCusto,
-    }));
+      return products.data.map((item: BlingProduct) => ({
+        id: item.id,
+        nome: item.nome,
+        preco: item.preco,
+        precoCusto: item.precoCusto,
+      }));
+    }
+
+    return {
+      success: false,
+      message: 'Erro ao buscar produtos',
+    };
   }
 
   async getAuthorizeUrl({ slug }): Promise<{ url: string }> {
@@ -118,16 +125,25 @@ export class BlingService {
       throw new BadRequestException('Organização não encontrada');
     }
 
-    return this.blingRepository.getTokensByOrganizationSlug(organization?.id);
+    const tokens = await this.blingRepository.getTokensByOrganizationSlug(
+      organization?.id,
+    );
+
+    return tokens;
   }
 
   async getValidAccessToken({ slug }: { slug: string }) {
-    const token = await this.getTokensByOrganizationSlug(slug);
+    const tokens = await this.getTokensByOrganizationSlug(slug);
 
-    if (!token) throw new Error('Token não encontrado');
+    if (!tokens) {
+      return {
+        success: false,
+        message: 'Tokens não encontrados',
+      };
+    }
 
-    if (token.expiresAt.getTime() > Date.now()) {
-      return token;
+    if (tokens.expiresAt.getTime() > Date.now()) {
+      return tokens;
     }
 
     const clientId = process.env.BLING_CLIENT_ID;
@@ -139,7 +155,7 @@ export class BlingService {
     const requestBody = new URLSearchParams();
 
     requestBody.append('grant_type', 'refresh_token');
-    requestBody.append('refresh_token', token.refreshToken);
+    requestBody.append('refresh_token', tokens.refreshToken);
 
     const response = await ky.post(
       'https://www.bling.com.br/Api/v3/oauth/token',
@@ -164,14 +180,14 @@ export class BlingService {
       throw new BadRequestException('Organização não encontrada');
     }
 
-    await this.blingRepository.updateOrCreateTokens({
+    const updatedTokens = await this.blingRepository.updateOrCreateTokens({
       organizationId: organization.id,
       accessToken: json.access_token,
       refreshToken: json.refresh_token,
       expiresAt: newExpiresAt,
     });
 
-    return token;
+    return tokens;
   }
 
   async getProducts({

@@ -59,14 +59,17 @@ export class BlingController {
   ) {
     const blingTokens = await this.blingService.getValidAccessToken({ slug });
 
-    if (!blingTokens) {
-      throw new BadRequestException('Erro ao obter tokens do Bling');
+    if ('accessToken' in blingTokens) {
+      return await this.blingService.getProducts({
+        accessToken: blingTokens.accessToken,
+        page,
+        limit,
+      });
     }
 
-    return await this.blingService.getProducts({
-      accessToken: blingTokens.accessToken,
-      page,
-      limit,
-    });
+    return {
+      success: false,
+      message: 'Erro ao buscar produtos',
+    };
   }
 }
