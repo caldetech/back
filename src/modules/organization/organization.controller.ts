@@ -30,8 +30,6 @@ export class OrganizationController {
     @Request() req,
     @Body() { name, slug }: { name: string; slug: string },
   ) {
-    console.log('Tem permissão');
-
     return this.organizationService.createOrganization({
       name,
       slug,
