@@ -60,6 +60,8 @@ export class AuthService {
 
     const tokens = reply.getHeaders();
 
+    console.log(tokens);
+
     return {
       message: 'Login bem-sucedido',
       tokens,
