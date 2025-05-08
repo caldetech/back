@@ -1,44 +1,75 @@
-name: 🚀 Deploy para Elastic Beanstalk
-
+name: Deploy master
 on:
   push:
     branches:
       - master
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Checkout source code
+        uses: actions/checkout@v2
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v2
         with:
           node-version: '22'
 
       - name: Install dependencies
-        run: npm ci
+        run: |
+          npm install
+          npx prisma generate
+        working-directory: ./
 
-      - name: Build project
+      - name: Create .env file
+        run: |
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" > .env
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
+          echo "GOOGLE_CLIENT_ID=GOOGLE_CLIENT_ID" >> .env
+          echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> .env
+          echo "BLING_API_URL=${{ secrets.BLING_API_URL }}" >> .env
+          echo "BLING_CLIENT_ID=${{ secrets.BLING_CLIENT_ID }}" >> .env
+          echo "BLING_CLIENT_SECRET=${{ secrets.BLING_CLIENT_SECRET }}" >> .env
+          echo "PORT=${{ secrets.PORT }}" >> .env
+          echo "RESEND_API_KEY=${{ secrets.RESEND_API_KEY }}" >> .env
+          echo "FRONT_END=${{ secrets.FRONT_END }}" >> .env
+
+      - name: Apply migrations in production
+        run: |
+          npx prisma migrate deploy
+
+      - name: Build the application
         run: npm run build
+        working-directory: ./
 
-      - name: Install EB CLI
+      - name: Apply migrations in production (if needed)
         run: |
-          pip install --upgrade awsebcli
+          npx prisma migrate deploy
+        working-directory: ./
 
-      - name: Initialize EB CLI
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
+      - name: Generate deployment package
         run: |
-          eb init ${{ secrets.EB_APP_NAME }} --platform docker --region ${{ secrets.AWS_REGION }}
-          eb use ${{ secrets.EB_ENV_NAME }}
+          zip -r deploy.zip \
+            dist \
+            node_modules \
+            package.json \
+            package-lock.json \
+            Procfile \
+            .npmrc \
+            .env
+        working-directory: ./
 
-      - name: Deploy to Elastic Beanstalk
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        run: eb deploy
+      - name: Set EB version label
+        run: echo "VERSION_LABEL=deploy-$(date +%s)" >> $GITHUB_ENV
+
+      - name: Deploy to EB
+        uses: einaregilsson/beanstalk-deploy@v22
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: Production
+          environment_name: Production
+          version_label: ${{ env.VERSION_LABEL }}
+          region: us-east-1
+          deployment_package: deploy.zip
