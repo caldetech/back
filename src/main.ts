@@ -21,9 +21,8 @@ async function bootstrap() {
 
   app.enableCors({
     origin: [
-      'http://localhost:3000',
+      'https://management-system-front.vercel.app',
       'https://gestao.caldetech.com.br',
-      'http://gestao.caldetech.com.br',
     ],
     credentials: true,
   });
