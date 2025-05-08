@@ -16,7 +16,7 @@ async function bootstrap() {
   );
 
   await app.register(fastifyCookie, {
-    secret: process.env.COOKIE_SECRET || 'default-secret', // necessário se usar cookies assinados
+    secret: process.env.COOKIE_SECRET || 'default-secret',
   });
 
   app.enableCors({
