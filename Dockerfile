@@ -1,34 +1,20 @@
-# Etapa 1 - Build
-FROM node:20-alpine AS builder
+FROM node:22-alpine AS builder
 WORKDIR /app
 
-# Instala dependências
 COPY package*.json ./
-RUN npm install
+RUN npm ci
 
-# Gera arquivos do Prisma
-COPY prisma ./prisma
-RUN npx prisma generate 
-
-# Gera arquivos do projeto
 COPY . .
+
 RUN npm run build
 
-# Etapa 2 - Runtime
-FROM node:20-alpine
+FROM node:22-alpine
 WORKDIR /app
 
-# Copia dist e dependências
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/.env.prod .env  # Inclui o arquivo de env
 
-# ⚠️ Copia também os arquivos gerados pelo prisma
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
-
-# Copia o .env para dentro da imagem
-# COPY .env .env
-
-EXPOSE 3333
+EXPOSE 3000
 CMD ["node", "dist/main"]
