@@ -49,15 +49,7 @@ jobs:
         working-directory: ./
 
       - name: Generate deployment package
-        run: |
-          zip -r deploy.zip \
-            dist \
-            node_modules \
-            package.json \
-            package-lock.json \
-            Procfile \
-            .npmrc \
-            .env
+        run: zip -r deploy.zip . -x "*.git*" "deploy.zip"
         working-directory: ./
 
       - name: Set EB version label
