@@ -7,7 +7,7 @@ import {
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import fastifyStatic from '@fastify/static';
 import { join } from 'path';
-import fastifyCookie from '@fastify/cookie';
+import cookie from '@fastify/cookie';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -15,7 +15,7 @@ async function bootstrap() {
     new FastifyAdapter(),
   );
 
-  await app.register(fastifyCookie, {
+  await app.register(cookie, {
     secret: process.env.COOKIE_SECRET || 'default-secret',
   });
 

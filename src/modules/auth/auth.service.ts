@@ -54,6 +54,8 @@ export class AuthService {
       path: '/',
     });
 
+    console.log('Resposta com headers:', reply.getHeaders());
+
     return { message: 'Login bem-sucedido' };
   }
 }
