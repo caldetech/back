@@ -13,6 +13,7 @@ export class AuthGuard implements CanActivate {
   constructor(private readonly jwtService: JwtService) {}
 
   private extractTokenFromCookie(request: FastifyRequest): string | undefined {
+    console.log('Cookies:', request.cookies); // Adicione um log para depurar
     const token = request.cookies['token'];
     return token;
   }
