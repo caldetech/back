@@ -3,7 +3,6 @@ import { UserService } from '../user/user.service';
 import { compare } from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 import { FastifyReply } from 'fastify';
-import { HttpHeader } from 'fastify/types/utils';
 
 @Injectable()
 export class AuthService {
@@ -20,10 +19,7 @@ export class AuthService {
     email: string;
     password: string;
     reply: FastifyReply;
-  }): Promise<{
-    message: string;
-    tokens: Record<HttpHeader, string | number | string[] | undefined>;
-  }> {
+  }): Promise<{ message: string }> {
     const user = await this.userService.getUserByEmail(email);
 
     if (!user) {
@@ -58,13 +54,6 @@ export class AuthService {
       path: '/',
     });
 
-    const tokens = reply.getHeaders();
-
-    console.log(tokens);
-
-    return {
-      message: 'Login bem-sucedido',
-      tokens,
-    };
+    return { message: 'Login bem-sucedido' };
   }
 }
