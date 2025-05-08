@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { compare } from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
+import { FastifyReply } from 'fastify';
 
 @Injectable()
 export class AuthService {
@@ -10,7 +11,15 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async logIn(email: string, password: string): Promise<{ token: string }> {
+  async logIn({
+    email,
+    password,
+    reply,
+  }: {
+    email: string;
+    password: string;
+    reply: FastifyReply;
+  }): Promise<{ message: string }> {
     const user = await this.userService.getUserByEmail(email);
 
     if (!user) {
@@ -38,6 +47,13 @@ export class AuthService {
 
     const token = await this.jwtService.signAsync(payload);
 
-    return { token };
+    reply.setCookie('token', token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      path: '/',
+    });
+
+    return { message: 'Login bem-sucedido' };
   }
 }
