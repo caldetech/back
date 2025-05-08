@@ -24,6 +24,7 @@ async function bootstrap() {
       'https://management-system-front.vercel.app',
       'https://gestao.caldetech.com.br',
     ],
+    credentials: true,
   });
 
   app.register(fastifyStatic, {
