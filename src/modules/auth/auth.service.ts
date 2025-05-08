@@ -19,7 +19,7 @@ export class AuthService {
     email: string;
     password: string;
     reply: FastifyReply;
-  }): Promise<{ message: string }> {
+  }): Promise<{ token: string }> {
     const user = await this.userService.getUserByEmail(email);
 
     if (!user) {
@@ -54,6 +54,6 @@ export class AuthService {
       path: '/',
     });
 
-    return { message: 'Login bem-sucedido' };
+    return { token };
   }
 }
