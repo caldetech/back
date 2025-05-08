@@ -52,6 +52,7 @@ export class AuthService {
       secure: true,
       sameSite: 'none',
       path: '/',
+      domain: '.caldetech.com.br',
     });
 
     return { message: 'Login bem-sucedido' };
