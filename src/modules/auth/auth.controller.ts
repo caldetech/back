@@ -7,12 +7,14 @@ import {
   NotFoundException,
   Post,
   Request,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from './auth.guard';
 import { MemberService } from '../member/member.service';
 import { OrganizationService } from '../organization/organization.service';
+import { FastifyReply } from 'fastify';
 
 @Controller('/auth')
 export class AuthController {
@@ -26,9 +28,16 @@ export class AuthController {
   @Post('/log-in')
   async logIn(
     @Body()
-    { email, password }: { email: string; password: string },
+    {
+      email,
+      password,
+    }: {
+      email: string;
+      password: string;
+    },
+    @Res({ passthrough: true }) reply: FastifyReply,
   ) {
-    return this.authService.logIn(email, password);
+    return await this.authService.logIn({ email, password, reply });
   }
 
   @UseGuards(AuthGuard)
