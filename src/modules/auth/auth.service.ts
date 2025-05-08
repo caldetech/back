@@ -19,7 +19,7 @@ export class AuthService {
     email: string;
     password: string;
     reply: FastifyReply;
-  }): Promise<{ message: string }> {
+  }): Promise<{ token: string }> {
     const user = await this.userService.getUserByEmail(email);
 
     if (!user) {
@@ -47,14 +47,6 @@ export class AuthService {
 
     const token = await this.jwtService.signAsync(payload);
 
-    reply.setCookie('token', token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'none',
-      path: '/',
-      domain: '.caldetech.com.br',
-    });
-
-    return { message: 'Login bem-sucedido' };
+    return { token };
   }
 }
