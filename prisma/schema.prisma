@@ -343,7 +343,7 @@ model Commission {
   createdAt DateTime @default(now()) @map("created_at")
 
   @@unique([orderId, memberId])
-  @@map("Commission")
+  @@map("commissions")
 }
 
 

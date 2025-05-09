@@ -234,14 +234,14 @@ CREATE TABLE "payments" (
 );
 
 -- CreateTable
-CREATE TABLE "Commission" (
+CREATE TABLE "commissions" (
     "id" TEXT NOT NULL,
     "order_id" TEXT NOT NULL,
     "member_id" TEXT NOT NULL,
     "amount" DOUBLE PRECISION NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT "Commission_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "commissions_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -317,7 +317,7 @@ CREATE UNIQUE INDEX "bling_tokens_organization_id_key" ON "bling_tokens"("organi
 CREATE UNIQUE INDEX "assigned_members_order_id_member_id_key" ON "assigned_members"("order_id", "member_id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Commission_order_id_member_id_key" ON "Commission"("order_id", "member_id");
+CREATE UNIQUE INDEX "commissions_order_id_member_id_key" ON "commissions"("order_id", "member_id");
 
 -- AddForeignKey
 ALTER TABLE "customers" ADD CONSTRAINT "customers_organization_id_fkey" FOREIGN KEY ("organization_id") REFERENCES "organizations"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -386,7 +386,7 @@ ALTER TABLE "assigned_members" ADD CONSTRAINT "assigned_members_order_id_fkey" F
 ALTER TABLE "assigned_members" ADD CONSTRAINT "assigned_members_member_id_fkey" FOREIGN KEY ("member_id") REFERENCES "members"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Commission" ADD CONSTRAINT "Commission_order_id_fkey" FOREIGN KEY ("order_id") REFERENCES "orders"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "commissions" ADD CONSTRAINT "commissions_order_id_fkey" FOREIGN KEY ("order_id") REFERENCES "orders"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Commission" ADD CONSTRAINT "Commission_member_id_fkey" FOREIGN KEY ("member_id") REFERENCES "members"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "commissions" ADD CONSTRAINT "commissions_member_id_fkey" FOREIGN KEY ("member_id") REFERENCES "members"("id") ON DELETE CASCADE ON UPDATE CASCADE;

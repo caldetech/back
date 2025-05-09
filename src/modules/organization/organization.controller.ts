@@ -20,9 +20,6 @@ export class OrganizationController {
 
   @Post('/create')
   @UseGuards(AuthGuard)
-  @CheckPoliciesFromRole((ability: AppAbility) =>
-    ability.can('manage', 'Organization'),
-  )
   async createOrganization(
     @Request() req,
     @Body() { name, slug }: { name: string; slug: string },
