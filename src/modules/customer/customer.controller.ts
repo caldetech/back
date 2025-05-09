@@ -4,8 +4,6 @@ import { AuthGuard } from '../auth/auth.guard';
 import { CustomerTypes } from 'src/enums';
 import { OrganizationContextGuard } from '../authorization/guards/organization-context.guard';
 import { PoliciesGuard } from '../authorization/guards/policies.guard';
-import { CheckPoliciesFromRole } from '../authorization/decorators/check-policies-from-role.decorator';
-import type { AppAbility } from '../casl/types/casl.types';
 
 @Controller('/customers')
 export class CustomerController {
@@ -13,7 +11,6 @@ export class CustomerController {
 
   @Post('/search')
   @UseGuards(AuthGuard)
-  @CheckPoliciesFromRole((ability: AppAbility) => ability.can('get', 'User'))
   async searchCustomers(
     @Body() { slug, query }: { slug: string; query: string },
   ) {
@@ -22,7 +19,6 @@ export class CustomerController {
 
   @Post('/create')
   @UseGuards(AuthGuard)
-  @CheckPoliciesFromRole((ability: AppAbility) => ability.can('create', 'User'))
   async createCustomer(
     @Body()
     {
@@ -56,7 +52,6 @@ export class CustomerController {
 
   @Get('/all')
   @UseGuards(AuthGuard, OrganizationContextGuard, PoliciesGuard)
-  @CheckPoliciesFromRole((ability: AppAbility) => ability.can('get', 'User'))
   async getCustomers(
     @Query('page') page: number,
     @Query('limit') limit: number,
