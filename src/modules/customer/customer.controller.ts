@@ -12,7 +12,7 @@ export class CustomerController {
   constructor(private readonly customerService: CustomerService) {}
 
   @Post('/search')
-  @UseGuards(AuthGuard, OrganizationContextGuard, PoliciesGuard)
+  @UseGuards(AuthGuard)
   @CheckPoliciesFromRole((ability: AppAbility) => ability.can('get', 'User'))
   async searchCustomers(
     @Body() { slug, query }: { slug: string; query: string },
@@ -21,7 +21,7 @@ export class CustomerController {
   }
 
   @Post('/create')
-  @UseGuards(AuthGuard, OrganizationContextGuard, PoliciesGuard)
+  @UseGuards(AuthGuard)
   @CheckPoliciesFromRole((ability: AppAbility) => ability.can('create', 'User'))
   async createCustomer(
     @Body()

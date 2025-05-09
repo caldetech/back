@@ -11,7 +11,7 @@ export class CommissionController {
   constructor(private readonly commissionservice: Commissionservice) {}
 
   @Get('/all')
-  @UseGuards(AuthGuard, OrganizationContextGuard, PoliciesGuard)
+  @UseGuards(AuthGuard)
   @CheckPoliciesFromRole((ability: AppAbility) =>
     ability.can('get', 'Commission'),
   )

@@ -40,7 +40,7 @@ export class OrganizationController {
   }
 
   @Get('/by-slug/:slug')
-  @UseGuards(AuthGuard, OrganizationContextGuard, PoliciesGuard)
+  @UseGuards(AuthGuard)
   async getOrganizationBySlug(@Body() slug: string) {
     const organization =
       await this.organizationService.getOrganizationBySlug(slug);
