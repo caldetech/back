@@ -69,8 +69,8 @@ export class UserController {
     });
   }
 
-  @UseGuards(AuthGuard)
   @Get('/by-email')
+  @UseGuards(AuthGuard)
   async getUserByEmail(
     @Query('email')
     email: string,
