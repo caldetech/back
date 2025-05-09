@@ -8,11 +8,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { OrganizationService } from './organization.service';
-import { OrganizationContextGuard } from '../authorization/guards/organization-context.guard';
 import { AuthGuard } from '../auth/auth.guard';
-import { PoliciesGuard } from '../authorization/guards/policies.guard';
-import { CheckPoliciesFromRole } from '../authorization/decorators/check-policies-from-role.decorator';
-import type { AppAbility } from '../casl/types/casl.types';
 
 @Controller('/organizations')
 export class OrganizationController {
