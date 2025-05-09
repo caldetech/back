@@ -8,6 +8,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import fastifyStatic from '@fastify/static';
 import { join } from 'path';
 import cookie from '@fastify/cookie';
+import cors from '@fastify/cors';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -19,7 +20,7 @@ async function bootstrap() {
     secret: process.env.COOKIE_SECRET || 'default-secret',
   });
 
-  app.enableCors({
+  await app.register(cors, {
     origin: [
       'https://management-system-front.vercel.app',
       'https://gestao.caldetech.com.br',
