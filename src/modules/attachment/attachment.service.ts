@@ -20,6 +20,12 @@ export class AttachmentService {
     private readonly s3: S3Client,
   ) {
     this.bucket = this.config.get<string>('AWS_BUCKET_NAME')!;
+
+    console.log('Bucket:', this.bucket);
+
+    if (!this.bucket) {
+      throw new Error('AWS_BUCKET_NAME is missing from environment');
+    }
   }
 
   async getAttachmentById({ id }: { id: string }) {
