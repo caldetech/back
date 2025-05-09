@@ -15,7 +15,7 @@ export class AuthGuard implements CanActivate {
   private extractTokenFromHeader(request: FastifyRequest): string | undefined {
     const authorization = request.headers.authorization;
 
-    console.log(authorization);
+    console.log('request.headers', request.headers);
 
     if (!authorization) return undefined;
 
