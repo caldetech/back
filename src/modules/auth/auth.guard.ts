@@ -12,15 +12,21 @@ import { FastifyRequest } from 'fastify';
 export class AuthGuard implements CanActivate {
   constructor(private readonly jwtService: JwtService) {}
 
-  private extractTokenFromCookie(request: FastifyRequest): string | undefined {
-    console.log('Cookies:', request.cookies); // Adicione um log para depurar
-    const token = request.cookies['token'];
-    return token;
+  private extractTokenFromHeader(request: FastifyRequest): string | undefined {
+    const authorization = request.headers.authorization;
+
+    console.log(authorization);
+
+    if (!authorization) return undefined;
+
+    const [type, token] = authorization.split(' ');
+
+    return type === 'Bearer' ? token : undefined;
   }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const token = this.extractTokenFromCookie(request);
+    const token = this.extractTokenFromHeader(request);
 
     if (!token) {
       throw new UnauthorizedException();
