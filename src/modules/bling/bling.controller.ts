@@ -20,7 +20,7 @@ export class BlingController {
   constructor(private readonly blingService: BlingService) {}
 
   @Post('/search')
-  @UseGuards(AuthGuard, OrganizationContextGuard, PoliciesGuard)
+  @UseGuards(AuthGuard)
   @CheckPoliciesFromRole((ability: AppAbility) => ability.can('get', 'Bling'))
   async searchCProducts(
     @Body() { slug, query }: { slug: string; query: string },
@@ -29,28 +29,28 @@ export class BlingController {
   }
 
   @Post('/get-authorize-url')
-  @UseGuards(AuthGuard, OrganizationContextGuard, PoliciesGuard)
+  @UseGuards(AuthGuard)
   @CheckPoliciesFromRole((ability: AppAbility) => ability.can('get', 'Bling'))
   async getAuthorizeUrl(@Body() { slug }: { slug: string }) {
     return await this.blingService.getAuthorizeUrl({ slug });
   }
 
   @Post('/get-tokens')
-  @UseGuards(AuthGuard, OrganizationContextGuard, PoliciesGuard)
+  @UseGuards(AuthGuard)
   @CheckPoliciesFromRole((ability: AppAbility) => ability.can('get', 'Bling'))
   async getTokens(@Body() { code, state }: { code: string; state: string }) {
     return await this.blingService.getTokens({ code, slug: state });
   }
 
   @Post('/get-valid-access-token')
-  @UseGuards(AuthGuard, OrganizationContextGuard, PoliciesGuard)
+  @UseGuards(AuthGuard)
   @CheckPoliciesFromRole((ability: AppAbility) => ability.can('get', 'Bling'))
   async getValidAccessToken(@Body() { slug }: { slug: string }) {
     return await this.blingService.getValidAccessToken({ slug });
   }
 
   @Get('/get-products')
-  @UseGuards(AuthGuard, OrganizationContextGuard, PoliciesGuard)
+  @UseGuards(AuthGuard)
   @CheckPoliciesFromRole((ability: AppAbility) => ability.can('get', 'Bling'))
   async getProducts(
     @Query('page') page: number,
