@@ -28,7 +28,7 @@ export class OrderRepository {
     paymentAmount?: number;
     blingProducts: {
       id: string;
-      name: string;
+      nome: string;
       preco: number;
       precoCusto: number;
       quantity: number;

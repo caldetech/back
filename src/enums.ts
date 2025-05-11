@@ -6,7 +6,7 @@ export enum EmailTypes {
 
 export enum CustomerTypes {
   COMPANY = 'COMPANY',
-  PERSONAL = 'PERSONAL',
+  PERSONAL = 'PERSON',
 }
 
 export enum OrderTypes {
