@@ -11,7 +11,9 @@ export class ProductRepository {
         data: blingProducts.map((product) => {
           return {
             blingId: product.id,
-            nome: product.nome,
+            name: product.nome,
+            price: product.preco,
+            costPrice: product.precoCusto,
             organizationId,
           };
         }),

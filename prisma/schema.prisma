@@ -10,12 +10,12 @@ datasource db {
 
 enum CustomerType {
   COMPANY
-  PERSONAL
+  PERSON
 }
 
 model Customer {
   id             String        @id @default(uuid())
-  customerType   CustomerType
+  customerType   CustomerType 
   name           String
   document       String?       @unique
   mainNumber     String?
@@ -253,8 +253,10 @@ model OrderAttachment {
 
 model Product {
   id          String   @id @default(uuid())
-  nome       String
+  name       String
   blingId BigInt @unique 
+  price Float
+  costPrice Float
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
