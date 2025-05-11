@@ -156,6 +156,7 @@ export class OrderRepository {
           customer: {
             select: {
               name: true,
+              address: true,
             },
           },
           payment: {
@@ -164,6 +165,30 @@ export class OrderRepository {
             },
           },
           orderAttachment: true,
+          productOrder: {
+            select: {
+              product: {
+                select: {
+                  nome: true,
+                },
+              },
+              quantity: true,
+            },
+          },
+          assignedMembers: {
+            select: {
+              member: {
+                select: {
+                  id: true,
+                  user: {
+                    select: {
+                      name: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
         },
       });
 
@@ -181,6 +206,7 @@ export class OrderRepository {
         customer: z
           .object({
             name: z.string(),
+            address: z.string(),
           })
           .nullable(),
         payment: z
@@ -200,15 +226,46 @@ export class OrderRepository {
             createdAt: z.date(),
           }),
         ),
+        productOrder: z
+          .array(
+            z.object({
+              product: z.object({
+                nome: z.string(),
+              }),
+              quantity: z.number(),
+            }),
+          )
+          .nullable(),
+        assignedMembers: z
+          .array(
+            z.object({
+              member: z.object({
+                id: z.string(),
+                user: z.object({
+                  name: z.string(),
+                }),
+              }),
+            }),
+          )
+          .nullable(),
       });
 
       const orderDTOSchema = rawOrderSchema.transform((order) => ({
         id: order.id,
         type: order.type,
         customer: order.customer?.name ?? null,
+        address: order.customer?.address ?? null,
         payment: order.payment?.status ?? null,
         status: order.status,
         orderAttachment: order.orderAttachment,
+        productOrder: order.productOrder?.map((po) => ({
+          productName: po.product.nome,
+          quantity: po.quantity,
+        })),
+        assignedMembers: order.assignedMembers?.map((am) => ({
+          memberId: am.member.id,
+          memberName: am.member.user.name,
+        })),
       }));
 
       const filteredOrders = orders.map((order) => orderDTOSchema.parse(order));

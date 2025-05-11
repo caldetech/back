@@ -210,7 +210,8 @@ enum OrderStatus {
 
 model Order {
   id              String         @id @default(uuid())
-  createdAt       DateTime       @default(now()) @map("created_at")
+  orderNumber Int @default(autoincrement())
+  createdAt   DateTime       @default(now()) @map("created_at")
   updatedAt       DateTime       @updatedAt @map("updated_at")
   organization    Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   organizationId  String         @map("organization_id")
@@ -218,6 +219,7 @@ model Order {
   ownerId         String?         @map("owner_id")
   type            OrderType
   status OrderStatus @default(OPEN)
+  show Boolean @default(true)
 
   customer Customer? @relation(fields: [customerid], references: [id], onDelete: SetNull)
   customerid String?
