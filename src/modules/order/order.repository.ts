@@ -28,14 +28,14 @@ export class OrderRepository {
     paymentAmount?: number;
     blingProducts: {
       id: string;
-      nome: string;
+      name: string;
       preco: number;
       precoCusto: number;
       quantity: number;
     }[];
     storedProducts: {
       id: string;
-      nome: string;
+      name: string;
       blingId: BigInt;
       createdAt: Date;
       updatedAt: Date;
@@ -153,10 +153,12 @@ export class OrderRepository {
           id: true,
           type: true,
           status: true,
+          orderNumber: true,
           customer: {
             select: {
               name: true,
               address: true,
+              customerType: true,
             },
           },
           payment: {
@@ -169,7 +171,7 @@ export class OrderRepository {
             select: {
               product: {
                 select: {
-                  nome: true,
+                  name: true,
                 },
               },
               quantity: true,
@@ -203,10 +205,12 @@ export class OrderRepository {
       const rawOrderSchema = z.object({
         id: z.string(),
         type: z.string(),
+        orderNumber: z.number(),
         customer: z
           .object({
             name: z.string(),
             address: z.string(),
+            customerType: z.enum(['COMPANY', 'PERSON']),
           })
           .nullable(),
         payment: z
@@ -230,7 +234,7 @@ export class OrderRepository {
           .array(
             z.object({
               product: z.object({
-                nome: z.string(),
+                name: z.string(),
               }),
               quantity: z.number(),
             }),
@@ -253,13 +257,15 @@ export class OrderRepository {
       const orderDTOSchema = rawOrderSchema.transform((order) => ({
         id: order.id,
         type: order.type,
+        orderNumber: order.orderNumber,
         customer: order.customer?.name ?? null,
         address: order.customer?.address ?? null,
+        customerType: order.customer?.customerType ?? null,
         payment: order.payment?.status ?? null,
         status: order.status,
         orderAttachment: order.orderAttachment,
         productOrder: order.productOrder?.map((po) => ({
-          productName: po.product.nome,
+          productName: po.product.name,
           quantity: po.quantity,
         })),
         assignedMembers: order.assignedMembers?.map((am) => ({
