@@ -37,6 +37,7 @@ export class OrderService {
     paymentMethod,
     paymentAmount,
     blingProducts,
+    services,
     members,
     commissionPercent,
     memberCommissions,
@@ -53,6 +54,11 @@ export class OrderService {
       preco: number;
       precoCusto: number;
       quantity: number;
+    }[];
+    services: {
+      id: string;
+      title: string;
+      price: number;
     }[];
     members: { id: string; name: string }[];
     commissionPercent: number;
@@ -89,6 +95,7 @@ export class OrderService {
       paymentMethod,
       paymentAmount,
       blingProducts,
+      services,
       storedProducts,
       members,
       commissionPercent,

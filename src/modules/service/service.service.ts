@@ -5,6 +5,10 @@ import { ServiceRepository } from './service.repository';
 export class ServiceService {
   constructor(private readonly serviceRepository: ServiceRepository) {}
 
+  async searchService({ slug, query }: { slug: string; query: string }) {
+    return this.serviceRepository.searchService({ query, slug });
+  }
+
   async createService({
     slug,
     title,

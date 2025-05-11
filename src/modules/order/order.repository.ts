@@ -14,6 +14,7 @@ export class OrderRepository {
     paymentMethod,
     paymentAmount,
     blingProducts,
+    services,
     storedProducts,
     members,
     commissionPercent,
@@ -32,6 +33,11 @@ export class OrderRepository {
       preco: number;
       precoCusto: number;
       quantity: number;
+    }[];
+    services: {
+      id: string;
+      title: string;
+      price: number;
     }[];
     storedProducts: {
       id: string;
@@ -172,6 +178,8 @@ export class OrderRepository {
               product: {
                 select: {
                   name: true,
+                  costPrice: true,
+                  price: true,
                 },
               },
               quantity: true,
@@ -235,6 +243,8 @@ export class OrderRepository {
             z.object({
               product: z.object({
                 name: z.string(),
+                price: z.number(),
+                costPrice: z.number(),
               }),
               quantity: z.number(),
             }),
@@ -266,6 +276,8 @@ export class OrderRepository {
         orderAttachment: order.orderAttachment,
         productOrder: order.productOrder?.map((po) => ({
           productName: po.product.name,
+          price: po.product.price,
+          costPrice: po.product.costPrice,
           quantity: po.quantity,
         })),
         assignedMembers: order.assignedMembers?.map((am) => ({
