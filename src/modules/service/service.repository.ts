@@ -5,6 +5,33 @@ import { PrismaService } from '../prisma/prisma.service';
 export class ServiceRepository {
   constructor(private readonly prisma: PrismaService) {}
 
+  async searchService({ query, slug }: { query: string; slug: string }) {
+    try {
+      const members = await this.prisma.service.findMany({
+        where: {
+          organization: {
+            slug,
+          },
+          title: {
+            contains: query,
+            mode: 'insensitive',
+          },
+        },
+        take: 3,
+        orderBy: { title: 'asc' },
+      });
+
+      return members.map((element) => {
+        return {
+          title: element.title,
+          price: element.price,
+        };
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   async createService({
     slug,
     title,

@@ -186,14 +186,28 @@ model ProductOrder {
   quantity  Int
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-  order Order @relation(fields: [orderid], references: [id], onDelete: Cascade) 
-  orderid String
-  product Product? @relation(fields: [productid], references: [id], onDelete: SetNull)
-  productid String?
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade) 
+  orderId String
+  product Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  productId String?
 
-  @@unique([orderid, productid])
-  @@unique([id, orderid])
+  @@unique([orderId, productId])
+  @@unique([id, orderId])
   @@map("product_orders")
+}
+
+model ServiceOrder {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade) 
+  orderId String
+  service Service? @relation(fields: [serviceId], references: [id], onDelete: SetNull)
+  serviceId String?
+
+  @@unique([orderId, serviceId])
+  @@unique([id, orderId])
+  @@map("service_orders")
 }
 
 enum OrderType {
@@ -228,6 +242,7 @@ model Order {
   paymentid String? @map("payment_id") @unique
 
   productOrder ProductOrder[]
+  serviceOrder ServiceOrder[]
   assignedMembers AssignedMember[]
   commissions     Commission[]
   orderAttachment OrderAttachment[]
@@ -278,6 +293,7 @@ model Service {
 
   organization   Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   organizationId String         @map("organization_id")
+  serviceOrder ServiceOrder[]
 
   @@map("services")
 }

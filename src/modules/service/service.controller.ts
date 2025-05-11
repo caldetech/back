@@ -6,6 +6,14 @@ import { AuthGuard } from '../auth/auth.guard';
 export class ServiceController {
   constructor(private readonly serviceService: ServiceService) {}
 
+  @Post('/search')
+  @UseGuards(AuthGuard)
+  async searchService(
+    @Body() { slug, query }: { slug: string; query: string },
+  ) {
+    return this.serviceService.searchService({ query, slug });
+  }
+
   @Post('/create')
   @UseGuards(AuthGuard)
   async createService(
