@@ -359,7 +359,7 @@ model Commission {
   orderId   String   @map("order_id")
   member    Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
   memberId  String   @map("member_id")
-  amount    Float
+  percentage    Float
   createdAt DateTime @default(now()) @map("created_at")
 
   @@unique([orderId, memberId])
