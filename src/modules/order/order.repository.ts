@@ -125,6 +125,17 @@ export class OrderRepository {
             };
           }),
         },
+        serviceOrder: {
+          create: services.map((element) => {
+            return {
+              service: {
+                connect: {
+                  id: element.id,
+                },
+              },
+            };
+          }),
+        },
       },
       include: {
         assignedMembers: true,
@@ -165,6 +176,16 @@ export class OrderRepository {
               name: true,
               address: true,
               customerType: true,
+            },
+          },
+          serviceOrder: {
+            select: {
+              service: {
+                select: {
+                  title: true,
+                  price: true,
+                },
+              },
             },
           },
           payment: {
@@ -250,6 +271,16 @@ export class OrderRepository {
             }),
           )
           .nullable(),
+        serviceOrder: z
+          .array(
+            z.object({
+              service: z.object({
+                title: z.string(),
+                price: z.number(),
+              }),
+            }),
+          )
+          .nullable(),
         assignedMembers: z
           .array(
             z.object({
@@ -279,6 +310,10 @@ export class OrderRepository {
           price: po.product.price,
           costPrice: po.product.costPrice,
           quantity: po.quantity,
+        })),
+        serviceOrder: order.serviceOrder?.map((po) => ({
+          title: po.service.title,
+          price: po.service.price,
         })),
         assignedMembers: order.assignedMembers?.map((am) => ({
           memberId: am.member.id,

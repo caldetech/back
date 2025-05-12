@@ -7,7 +7,7 @@ export class ServiceRepository {
 
   async searchService({ query, slug }: { query: string; slug: string }) {
     try {
-      const members = await this.prisma.service.findMany({
+      const services = await this.prisma.service.findMany({
         where: {
           organization: {
             slug,
@@ -19,14 +19,14 @@ export class ServiceRepository {
         },
         take: 3,
         orderBy: { title: 'asc' },
+        select: {
+          id: true,
+          title: true,
+          price: true,
+        },
       });
 
-      return members.map((element) => {
-        return {
-          title: element.title,
-          price: element.price,
-        };
-      });
+      return services;
     } catch (error) {
       console.log(error);
     }
