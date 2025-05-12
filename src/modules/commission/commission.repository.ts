@@ -32,7 +32,7 @@ export class CommissionRepository {
           id: true,
           memberId: true,
           orderId: true,
-          amount: true,
+          percentage: true,
           createdAt: true,
           member: {
             select: {
@@ -58,7 +58,7 @@ export class CommissionRepository {
 
       const commissionSchema = z.object({
         id: z.string(),
-        amount: z.number(),
+        percentage: z.number(),
         createdAt: z.date(),
         member: z.object({
           user: z.object({
@@ -72,7 +72,7 @@ export class CommissionRepository {
       const commissionDTOSchema = commissionSchema.transform((commission) => ({
         id: commission.id,
         member: commission.member?.user?.name ?? null,
-        amount: commission.amount,
+        percentage: commission.percentage,
         createdAt: commission.createdAt,
         memberId: commission.memberId ?? null,
         orderId: commission.orderId,
