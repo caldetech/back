@@ -105,7 +105,7 @@ export class OrderRepository {
         commissions: {
           create: memberCommissions.map((member) => {
             return {
-              amount: member.value,
+              percentage: member.value,
               member: {
                 connect: {
                   id: member.memberId,
@@ -214,6 +214,7 @@ export class OrderRepository {
             select: {
               service: {
                 select: {
+                  id: true,
                   title: true,
                   price: true,
                 },
@@ -224,6 +225,7 @@ export class OrderRepository {
             select: {
               status: true,
               amount: true,
+              method: true,
             },
           },
           orderAttachment: true,
@@ -231,6 +233,7 @@ export class OrderRepository {
             select: {
               product: {
                 select: {
+                  blingId: true,
                   name: true,
                   costPrice: true,
                   price: true,
@@ -251,6 +254,12 @@ export class OrderRepository {
                   },
                 },
               },
+            },
+          },
+          commissions: {
+            select: {
+              percentage: true,
+              memberId: true,
             },
           },
         },
@@ -276,6 +285,14 @@ export class OrderRepository {
           .object({
             status: z.string(),
             amount: z.number(),
+            method: z.enum([
+              'PIX',
+              'CARTAO',
+              'BOLETO',
+              'DINHEIRO',
+              'DEPOSITO',
+              'PENDENTE',
+            ]),
           })
           .nullable(),
         status: z.string(),
@@ -294,6 +311,7 @@ export class OrderRepository {
           .array(
             z.object({
               product: z.object({
+                blingId: z.bigint(),
                 name: z.string(),
                 price: z.number(),
                 costPrice: z.number(),
@@ -306,6 +324,7 @@ export class OrderRepository {
           .array(
             z.object({
               service: z.object({
+                id: z.string(),
                 title: z.string(),
                 price: z.number(),
               }),
@@ -324,6 +343,14 @@ export class OrderRepository {
             }),
           )
           .nullable(),
+        commissions: z
+          .array(
+            z.object({
+              percentage: z.number(),
+              memberId: z.string(),
+            }),
+          )
+          .optional(),
       });
 
       const orderDTOSchema = rawOrderSchema.transform((order) => ({
@@ -335,23 +362,35 @@ export class OrderRepository {
         address: order.customer?.address ?? null,
         customerType: order.customer?.customerType ?? null,
         payment: order.payment?.status ?? null,
+        method: order.payment?.method ?? null,
         amount: order.payment?.amount ?? null,
         status: order.status,
         orderAttachment: order.orderAttachment,
         productOrder: order.productOrder?.map((po) => ({
+          blingId:
+            typeof po.product.blingId === 'bigint'
+              ? Number(po.product.blingId)
+              : po.product.blingId,
           productName: po.product.name,
           price: po.product.price,
           costPrice: po.product.costPrice,
           quantity: po.quantity,
         })),
         serviceOrder: order.serviceOrder?.map((po) => ({
+          id: po.service.id,
           title: po.service.title,
           price: po.service.price,
         })),
-        assignedMembers: order.assignedMembers?.map((am) => ({
-          memberId: am.member.id,
-          memberName: am.member.user.name,
-        })),
+        assignedMembers: order.assignedMembers?.map((am) => {
+          const commission = order.commissions?.find(
+            (c) => c.memberId === am.member.id,
+          );
+          return {
+            memberId: am.member.id,
+            memberName: am.member.user.name,
+            percentage: commission?.percentage ?? null,
+          };
+        }),
       }));
 
       const filteredOrders = orders.map((order) => orderDTOSchema.parse(order));
