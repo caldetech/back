@@ -25,17 +25,33 @@ export class OrderController {
     private readonly prisma: PrismaService,
   ) {}
 
+  @Post('/update-visibility')
+  @UseGuards(AuthGuard)
+  async updateOrderVisibility(
+    @Body()
+    { orderId, showOrder }: { orderId: string; showOrder: boolean },
+  ) {
+    return await this.orderService.updateOrderVisibility({
+      orderId,
+      showOrder,
+    });
+  }
+
   @Get('/all')
   @UseGuards(AuthGuard)
   async getOrders(
     @Query('page') page: number,
     @Query('limit') limit: number,
     @Query('slug') slug: string,
+    @Query('role') role: string,
+    @Query('memberId') memberId: string,
   ) {
     return await this.orderService.getOrders({
       page,
       limit,
       slug,
+      role,
+      memberId,
     });
   }
 
@@ -55,6 +71,7 @@ export class OrderController {
       commissionPercent,
       memberCommissions,
       customer,
+      showOrder,
     }: {
       slug: string;
       type: OrderTypes;
@@ -83,6 +100,7 @@ export class OrderController {
         contactNumber: string;
         address: string;
       };
+      showOrder: boolean;
     },
   ) {
     const user = req.user;
@@ -99,6 +117,7 @@ export class OrderController {
       memberCommissions,
       customer,
       ownerId: user.id,
+      showOrder,
     });
   }
 }
