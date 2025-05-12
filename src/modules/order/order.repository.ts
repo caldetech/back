@@ -8,6 +8,23 @@ import { z } from 'zod';
 export class OrderRepository {
   constructor(private readonly prisma: PrismaService) {}
 
+  async updateOrderVisibility({
+    orderId,
+    showOrder,
+  }: {
+    orderId: string;
+    showOrder: boolean;
+  }) {
+    return await this.prisma.order.update({
+      where: {
+        id: orderId,
+      },
+      data: {
+        show: showOrder,
+      },
+    });
+  }
+
   async createOrder({
     slug,
     type,
@@ -22,6 +39,7 @@ export class OrderRepository {
     customer,
     ownerId,
     organizationId,
+    showOrder,
   }: {
     slug: string;
     type: OrderTypes;
@@ -60,10 +78,12 @@ export class OrderRepository {
     };
     ownerId: string;
     organizationId: string;
+    showOrder: boolean;
   }) {
     return this.prisma.order.create({
       data: {
         type,
+        show: showOrder,
         organization: {
           connect: {
             slug,
@@ -150,27 +170,39 @@ export class OrderRepository {
     page,
     limit,
     slug,
+    role,
+    memberId,
   }: {
     page: number;
     limit: number;
     slug: string;
+    role: string;
+    memberId: string;
   }) {
     try {
       const skip = (page - 1) * limit;
 
+      const isPrivileged = ['ADMIN', 'BILLING', 'MANAGER'].includes(role);
+
+      const whereClause = isPrivileged
+        ? {
+            organization: { slug },
+          }
+        : {
+            organization: { slug },
+            OR: [{ show: true }, { assignedMembers: { some: { memberId } } }],
+          };
+
       const orders = await this.prisma.order.findMany({
         skip,
         take: limit,
-        where: {
-          organization: {
-            slug,
-          },
-        },
+        where: whereClause,
         select: {
           id: true,
           type: true,
           status: true,
           orderNumber: true,
+          show: true,
           customer: {
             select: {
               name: true,
@@ -191,6 +223,7 @@ export class OrderRepository {
           payment: {
             select: {
               status: true,
+              amount: true,
             },
           },
           orderAttachment: true,
@@ -223,18 +256,15 @@ export class OrderRepository {
         },
       });
 
-      const total = await this.prisma.service.count({
-        where: {
-          organization: {
-            slug,
-          },
-        },
+      const total = await this.prisma.order.count({
+        where: whereClause,
       });
 
       const rawOrderSchema = z.object({
         id: z.string(),
         type: z.string(),
         orderNumber: z.number(),
+        show: z.boolean(),
         customer: z
           .object({
             name: z.string(),
@@ -245,6 +275,7 @@ export class OrderRepository {
         payment: z
           .object({
             status: z.string(),
+            amount: z.number(),
           })
           .nullable(),
         status: z.string(),
@@ -299,10 +330,12 @@ export class OrderRepository {
         id: order.id,
         type: order.type,
         orderNumber: order.orderNumber,
+        show: order.show,
         customer: order.customer?.name ?? null,
         address: order.customer?.address ?? null,
         customerType: order.customer?.customerType ?? null,
         payment: order.payment?.status ?? null,
+        amount: order.payment?.amount ?? null,
         status: order.status,
         orderAttachment: order.orderAttachment,
         productOrder: order.productOrder?.map((po) => ({

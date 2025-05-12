@@ -12,14 +12,31 @@ export class OrderService {
     private readonly productService: ProductService,
   ) {}
 
+  async updateOrderVisibility({
+    orderId,
+    showOrder,
+  }: {
+    orderId: string;
+    showOrder: boolean;
+  }) {
+    return await this.orderRepository.updateOrderVisibility({
+      orderId,
+      showOrder,
+    });
+  }
+
   async getOrders({
     page,
     limit,
     slug,
+    role,
+    memberId,
   }: {
     page: number;
     limit: number;
     slug: string;
+    role: string;
+    memberId: string;
   }) {
     const numericPage = Number(page);
     const numericLimit = Number(limit);
@@ -28,6 +45,8 @@ export class OrderService {
       page: numericPage,
       limit: numericLimit,
       slug,
+      role,
+      memberId,
     });
   }
 
@@ -43,6 +62,7 @@ export class OrderService {
     memberCommissions,
     customer,
     ownerId,
+    showOrder,
   }: {
     slug: string;
     type: OrderTypes;
@@ -72,6 +92,7 @@ export class OrderService {
       address: string;
     };
     ownerId: string;
+    showOrder: boolean;
   }) {
     const organization =
       await this.organizationService.getOrganizationBySlug(slug);
@@ -103,6 +124,7 @@ export class OrderService {
       customer,
       ownerId,
       organizationId: organization.id,
+      showOrder,
     });
   }
 }
