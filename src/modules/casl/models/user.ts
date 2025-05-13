@@ -4,7 +4,7 @@ import { roleSchema } from '../../../schemas/role';
 
 const organizationRoleSchema = z.object({
   id: z.string(),
-  role: z.enum(['MEMBER', 'ADMIN']), // Adicione mais opções se existirem
+  role: z.enum(['MEMBER', 'ADMIN', 'MANAGER', 'BILLING', 'DEV']), // Adicione mais opções se existirem
 });
 
 export const userSchema = z.object({

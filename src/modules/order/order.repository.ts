@@ -70,6 +70,7 @@ export class OrderRepository {
       data: {
         type,
         show: showOrder,
+        commissionPercent,
         organization: {
           connect: { slug },
         },
@@ -210,6 +211,7 @@ export class OrderRepository {
   }) {
     return this.prisma.order.create({
       data: {
+        commissionPercent,
         type,
         show: showOrder,
         organization: {
@@ -310,7 +312,13 @@ export class OrderRepository {
     try {
       const skip = (page - 1) * limit;
 
-      const isPrivileged = ['ADMIN', 'BILLING', 'MANAGER'].includes(role);
+      const isPrivileged = [
+        'ADMIN',
+        'BILLING',
+        'MANAGER',
+        'BILLING',
+        'DEV',
+      ].includes(role);
 
       const whereClause = isPrivileged
         ? {
@@ -331,6 +339,7 @@ export class OrderRepository {
           status: true,
           orderNumber: true,
           show: true,
+          commissionPercent: true,
           customer: {
             select: {
               id: true,
@@ -403,6 +412,7 @@ export class OrderRepository {
         type: z.string(),
         orderNumber: z.number(),
         show: z.boolean(),
+        commissionPercent: z.number(),
         customer: z
           .object({
             id: z.string(),
@@ -488,6 +498,7 @@ export class OrderRepository {
         type: order.type,
         orderNumber: order.orderNumber,
         show: order.show,
+        commissionPercent: order.commissionPercent,
         customerId: order.customer?.id ?? null,
         customer: order.customer?.name ?? null,
         address: order.customer?.address ?? null,
