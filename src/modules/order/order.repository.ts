@@ -8,6 +8,134 @@ import { z } from 'zod';
 export class OrderRepository {
   constructor(private readonly prisma: PrismaService) {}
 
+  async updateOrder({
+    orderId,
+    slug,
+    type,
+    paymentMethod,
+    paymentAmount,
+    blingProducts,
+    services,
+    storedProducts,
+    members,
+    commissionPercent,
+    memberCommissions,
+    customer,
+    ownerId,
+    organizationId,
+    showOrder,
+  }: {
+    orderId: string;
+    slug: string;
+    type: OrderTypes;
+    paymentMethod: paymentMethodTypes;
+    paymentAmount?: number;
+    blingProducts: {
+      id: string;
+      nome: string;
+      preco: number;
+      precoCusto: number;
+      quantity: number;
+    }[];
+    services: {
+      id: string;
+      title: string;
+      price: number;
+    }[];
+    storedProducts: {
+      id: string;
+      name: string;
+      blingId: BigInt;
+      createdAt: Date;
+      updatedAt: Date;
+      organizationId: string;
+    }[];
+    members: { id: string; name: string }[];
+    commissionPercent: number;
+    memberCommissions: { memberId: string; value: number }[];
+    customer: {
+      id: string;
+      customerType: CustomerTypes;
+      name: string;
+      mainNumber: string;
+      contactNumber: string;
+      address: string;
+    };
+    ownerId: string;
+    organizationId: string;
+    showOrder: boolean;
+  }) {
+    return this.prisma.order.update({
+      where: { id: orderId },
+      data: {
+        type,
+        show: showOrder,
+        organization: {
+          connect: { slug },
+        },
+        owner: {
+          connect: {
+            organizationId_userId: {
+              organizationId,
+              userId: ownerId,
+            },
+          },
+        },
+        customer: {
+          connect: {
+            id: customer.id,
+          },
+        },
+        commissions: {
+          deleteMany: {},
+          create: memberCommissions.map((member) => ({
+            percentage: member.value,
+            member: { connect: { id: member.memberId } },
+          })),
+        },
+        payment: paymentAmount
+          ? {
+              upsert: {
+                update: {
+                  amount: paymentAmount,
+                  method: paymentMethod,
+                },
+                create: {
+                  amount: paymentAmount,
+                  method: paymentMethod,
+                },
+              },
+            }
+          : undefined,
+        assignedMembers: {
+          deleteMany: {},
+          create: members.map((member) => ({
+            member: { connect: { id: member.id } },
+          })),
+        },
+        productOrder: {
+          deleteMany: {},
+          create: blingProducts.map((product) => ({
+            quantity: product.quantity,
+            product: { connect: { blingId: product.id } },
+          })),
+        },
+        serviceOrder: {
+          deleteMany: {},
+          create: services.map((service) => ({
+            service: { connect: { id: service.id } },
+          })),
+        },
+      },
+      include: {
+        assignedMembers: true,
+        payment: true,
+        commissions: true,
+        productOrder: true,
+      },
+    });
+  }
+
   async updateOrderVisibility({
     orderId,
     showOrder,
@@ -205,6 +333,7 @@ export class OrderRepository {
           show: true,
           customer: {
             select: {
+              id: true,
               name: true,
               address: true,
               customerType: true,
@@ -276,6 +405,7 @@ export class OrderRepository {
         show: z.boolean(),
         customer: z
           .object({
+            id: z.string(),
             name: z.string(),
             address: z.string(),
             customerType: z.enum(['COMPANY', 'PERSON']),
@@ -358,6 +488,7 @@ export class OrderRepository {
         type: order.type,
         orderNumber: order.orderNumber,
         show: order.show,
+        customerId: order.customer?.id ?? null,
         customer: order.customer?.name ?? null,
         address: order.customer?.address ?? null,
         customerType: order.customer?.customerType ?? null,
