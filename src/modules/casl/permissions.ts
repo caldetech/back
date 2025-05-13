@@ -10,6 +10,11 @@ type PermissionsByRole = (
 ) => void;
 
 export const permissions: Record<Role, PermissionsByRole> = {
+  DEV(_, { can, cannot }) {
+    can('manage', 'all');
+    cannot(['transfer_ownership', 'update'], 'Organization');
+    can(['transfer_ownership', 'update'], 'Organization');
+  },
   ADMIN(_, { can, cannot }) {
     can('manage', 'all');
     cannot(['transfer_ownership', 'update'], 'Organization');

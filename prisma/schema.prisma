@@ -93,6 +93,7 @@ model Account {
 }
 
 enum Role {
+  DEV
   ADMIN
   MEMBER
   BILLING
@@ -234,6 +235,7 @@ model Order {
   type            OrderType
   status OrderStatus @default(OPEN)
   show Boolean @default(true)
+  commissionPercent Float
 
   customer Customer? @relation(fields: [customerid], references: [id], onDelete: SetNull)
   customerid String?
