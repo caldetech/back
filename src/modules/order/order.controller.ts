@@ -120,4 +120,73 @@ export class OrderController {
       showOrder,
     });
   }
+
+  @Post('/update')
+  @UseGuards(AuthGuard)
+  async updateOrder(
+    @Request() req,
+    @Body()
+    {
+      orderId,
+      slug,
+      type,
+      paymentMethod,
+      paymentAmount,
+      blingProducts,
+      services,
+      members,
+      commissionPercent,
+      memberCommissions,
+      customer,
+      showOrder,
+    }: {
+      orderId: string;
+      slug: string;
+      type: OrderTypes;
+      paymentMethod: paymentMethodTypes;
+      paymentAmount?: number;
+      blingProducts: {
+        id: string;
+        nome: string;
+        preco: number;
+        precoCusto: number;
+        quantity: number;
+      }[];
+      services: {
+        id: string;
+        title: string;
+        price: number;
+      }[];
+      members: { id: string; name: string }[];
+      commissionPercent: number;
+      memberCommissions: { memberId: string; value: number }[];
+      customer: {
+        id: string;
+        customerType: CustomerTypes;
+        name: string;
+        mainNumber: string;
+        contactNumber: string;
+        address: string;
+      };
+      showOrder: boolean;
+    },
+  ) {
+    const user = req.user;
+
+    return this.orderService.updateOrder({
+      orderId,
+      slug,
+      type,
+      paymentMethod,
+      paymentAmount,
+      blingProducts,
+      services,
+      members,
+      commissionPercent,
+      memberCommissions,
+      customer,
+      ownerId: user.id,
+      showOrder,
+    });
+  }
 }

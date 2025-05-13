@@ -127,4 +127,85 @@ export class OrderService {
       showOrder,
     });
   }
+
+  async updateOrder({
+    orderId,
+    slug,
+    type,
+    paymentMethod,
+    paymentAmount,
+    blingProducts,
+    services,
+    members,
+    commissionPercent,
+    memberCommissions,
+    customer,
+    ownerId,
+    showOrder,
+  }: {
+    orderId: string;
+    slug: string;
+    type: OrderTypes;
+    paymentMethod: paymentMethodTypes;
+    paymentAmount?: number;
+    blingProducts: {
+      id: string;
+      nome: string;
+      preco: number;
+      precoCusto: number;
+      quantity: number;
+    }[];
+    services: {
+      id: string;
+      title: string;
+      price: number;
+    }[];
+    members: { id: string; name: string }[];
+    commissionPercent: number;
+    memberCommissions: { memberId: string; value: number }[];
+    customer: {
+      id: string;
+      customerType: CustomerTypes;
+      name: string;
+      mainNumber: string;
+      contactNumber: string;
+      address: string;
+    };
+    ownerId: string;
+    showOrder: boolean;
+  }) {
+    const organization =
+      await this.organizationService.getOrganizationBySlug(slug);
+
+    if (!organization) {
+      throw new BadRequestException('Organização não encontrada');
+    }
+
+    const storedProducts = await this.productService.createProducts({
+      slug,
+      blingProducts,
+    });
+
+    if (!storedProducts) {
+      throw new BadRequestException('Erro ao armazenar produtos do Bling');
+    }
+
+    return this.orderRepository.updateOrder({
+      orderId,
+      slug,
+      type,
+      paymentMethod,
+      paymentAmount,
+      blingProducts,
+      services,
+      storedProducts,
+      members,
+      commissionPercent,
+      memberCommissions,
+      customer,
+      ownerId,
+      organizationId: organization.id,
+      showOrder,
+    });
+  }
 }
