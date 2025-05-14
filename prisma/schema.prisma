@@ -17,8 +17,8 @@ model Customer {
   id             String        @id @default(uuid())
   customerType   CustomerType 
   name           String
-  document       String?       @unique
-  mainNumber     String?
+  document       String?       
+  mainNumber     String       @unique
   contactNumber  String?       @map("contact_number")
   address        String        @map("address_description")
   createdAt      DateTime      @default(now()) @map("created_at")
@@ -296,7 +296,7 @@ model DescriptionService {
   updatedAt   DateTime @updatedAt @map("updated_at")
   Order Order[]
 
-  @@map("services")
+  @@map("description_services")
 }
 
 enum PaymentType {
@@ -313,6 +313,7 @@ enum PaymentStatus {
   RECEIVED
   CANCELLED
 }
+
 model BlingToken {
   id              String   @id @default(uuid())
   accessToken     String   @map("access_token")
