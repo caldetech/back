@@ -341,19 +341,35 @@ model AssignedMember {
   @@map("assigned_members")
 }
 
-model Payment {
-  id            String         @id @default(uuid())
-  amount        Float
-  method        PaymentType
-  status        PaymentStatus  @default(PENDING)
-  paidAt        DateTime?
-  createdAt     DateTime       @default(now()) @map("created_at")
-  updatedAt     DateTime       @updatedAt @map("updated_at")
+model PaymentInstallment {
+  id         String         @id @default(uuid())
+  dueDate    DateTime       @map("due_date")   // Data de vencimento da parcela
+  amount     Float                            // Valor da parcela
+  status     PaymentStatus  @default(PENDING)  // Usar o mesmo enum existente
+  paidAt     DateTime?                         // Quando foi pago (se pago)
+  payment    Payment        @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  paymentId  String         @map("payment_id")
+  createdAt  DateTime       @default(now()) @map("created_at")
+  updatedAt  DateTime       @updatedAt @map("updated_at")
 
-  Order Order[]
+  @@map("payment_installments")
+}
+
+model Payment {
+  id            String               @id @default(uuid())
+  amount        Float                                  // Valor total do pagamento
+  method        PaymentType
+  status        PaymentStatus        @default(PENDING)
+  paidAt        DateTime?
+  createdAt     DateTime             @default(now()) @map("created_at")
+  updatedAt     DateTime             @updatedAt @map("updated_at")
+
+  Order         Order[]                                 // Já existente
+  installments  PaymentInstallment[]                    // Novo campo
 
   @@map("payments")
 }
+
 
 
 
