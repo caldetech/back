@@ -52,7 +52,6 @@ model User {
   invites            Invite[]
   member_on          Member[]
   owns_organizations Organization[]
-  owns_projects      Project[]
 
   @@map("users")
 }
@@ -117,6 +116,37 @@ model Invite {
   @@map("invites")
 }
 
+model CommissionBase {
+  id String @id @default(uuid())
+  base Int 
+  value Int
+  target Boolean @default(false)
+  member Member @relation(fields: [memberid], references: [id])
+  memberid String @unique
+  createdAt                 DateTime @default(now()) @map("created_at")
+  updatedAt                 DateTime @updatedAt @map("updated_at")
+
+  @@map("commissions_base")
+}
+
+enum CommissionTarget {
+  NEXT
+  CURRENT
+}
+
+model SingleCommission {
+  id String @id @default(uuid())
+  value Int
+  flag CommissionTarget @default(CURRENT)
+  member Member @relation(fields: [memberid], references: [id])
+  memberid String
+  createdAt                 DateTime @default(now()) @map("created_at")
+
+  Order Order[]
+
+  @@map("single_commissions")
+}
+
 model Member {
   id                  String              @id @default(uuid())
   role                Role                @default(MEMBER)
@@ -126,10 +156,11 @@ model Member {
   userId              String              @map("user_id")
   own_orders          Order[]
   AssignedMember AssignedMember[]
-  commissions Commission[]
 
   @@unique([organizationId, userId])
   @@map("members")
+  CommissionBase CommissionBase[]
+  SingleCommission SingleCommission[]
 } 
 
 enum OrganizationStatus {
@@ -156,30 +187,10 @@ model Organization {
   members   Member[]
   orders    Order[]
   products  Product[]
-  services  Service[]
   customers Customer[]
-  projects  Project[]
 
   @@map("organizations")
   BlingToken BlingToken[]
-}
-
-model Project {
-  id          String   @id @default(uuid())
-  name        String
-  description String
-  slug        String   @unique
-  avatarUrl   String?  @map("avatar_url")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  organizationId String       @map("organization_id")
-
-  owner   User   @relation(fields: [ownerId], references: [id])
-  ownerId String @map("owner_id")
-
-  @@map("projects")
 }
 
 model ProductOrder {
@@ -197,20 +208,6 @@ model ProductOrder {
   @@map("product_orders")
 }
 
-model ServiceOrder {
-  id        String   @id @default(uuid())
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade) 
-  orderId String
-  service Service? @relation(fields: [serviceId], references: [id], onDelete: SetNull)
-  serviceId String?
-
-  @@unique([orderId, serviceId])
-  @@unique([id, orderId])
-  @@map("service_orders")
-}
-
 enum OrderType {
   SALE
   BUDGET
@@ -225,17 +222,22 @@ enum OrderStatus {
 
 model Order {
   id              String         @id @default(uuid())
-  orderNumber Int @default(autoincrement())
-  createdAt   DateTime       @default(now()) @map("created_at")
-  updatedAt       DateTime       @updatedAt @map("updated_at")
-  organization    Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  organizationId  String         @map("organization_id")
-  owner          Member?         @relation(fields: [ownerId], references: [id], onDelete: SetNull)
-  ownerId         String?         @map("owner_id")
+  orderNumber Int @default(autoincrement()) @map("order_number")
   type            OrderType
   status OrderStatus @default(OPEN)
   show Boolean @default(true)
-  commissionPercent Float
+
+  scheduleDate DateTime @map("schedule_date")
+  scheduleTime DateTime @map("schedule_time")
+
+  owner          Member?         @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+  ownerId         String?         @map("owner_id")
+
+  organization    Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId  String         @map("organization_id")
+
+  description DescriptionService @relation(fields: [descriptionid], references: [id])
+  descriptionid String
 
   customer Customer? @relation(fields: [customerid], references: [id], onDelete: SetNull)
   customerid String?
@@ -244,10 +246,12 @@ model Order {
   paymentid String? @map("payment_id") @unique
 
   productOrder ProductOrder[]
-  serviceOrder ServiceOrder[]
   assignedMembers AssignedMember[]
-  commissions     Commission[]
   orderAttachment OrderAttachment[]
+  singleCommission SingleCommission[]
+
+  createdAt   DateTime       @default(now()) @map("created_at")
+  updatedAt       DateTime       @updatedAt @map("updated_at")
 
   @@unique([id, paymentid])
   @@unique([id, ownerId])
@@ -285,17 +289,12 @@ model Product {
   @@map("products")
 }
 
-model Service {
+model DescriptionService {
   id          String   @id @default(uuid())
-  title       String
-  description String?
-  price       Float
+  description String
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
-
-  organization   Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  organizationId String         @map("organization_id")
-  serviceOrder ServiceOrder[]
+  Order Order[]
 
   @@map("services")
 }
@@ -355,18 +354,6 @@ model Payment {
   @@map("payments")
 }
 
-model Commission {
-  id        String   @id @default(uuid())
-  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  orderId   String   @map("order_id")
-  member    Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
-  memberId  String   @map("member_id")
-  percentage    Float
-  createdAt DateTime @default(now()) @map("created_at")
-
-  @@unique([orderId, memberId])
-  @@map("commissions")
-}
 
 
 
