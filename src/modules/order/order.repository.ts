@@ -161,7 +161,7 @@ export class OrderRepository {
     showOrder,
     scheduleDate,
     scheduleTime,
-    description,
+    note,
   }: {
     slug: string;
     type: OrderTypes;
@@ -202,7 +202,7 @@ export class OrderRepository {
     showOrder: boolean;
     scheduleDate: Date;
     scheduleTime: Date;
-    description: string;
+    note: string;
   }) {
     return this.prisma.order.create({
       data: {
@@ -210,7 +210,11 @@ export class OrderRepository {
         show: showOrder,
         scheduleDate,
         scheduleTime,
-        description,
+        note: {
+          create: {
+            note,
+          },
+        },
         organization: {
           connect: {
             slug,
@@ -276,7 +280,7 @@ export class OrderRepository {
       include: {
         assignedMembers: true,
         payment: true,
-        commissions: true,
+        singleCommission: true,
         productOrder: true,
       },
     });
@@ -368,10 +372,10 @@ export class OrderRepository {
               },
             },
           },
-          commissions: {
+          singleCommission: {
             select: {
-              percentage: true,
-              memberId: true,
+              value: true,
+              memberid: true,
             },
           },
         },
@@ -445,10 +449,10 @@ export class OrderRepository {
             }),
           )
           .nullable(),
-        commissions: z
+        singleCommission: z
           .array(
             z.object({
-              percentage: z.number(),
+              value: z.number(),
               memberId: z.string(),
             }),
           )
@@ -480,13 +484,13 @@ export class OrderRepository {
           quantity: po.quantity,
         })),
         assignedMembers: order.assignedMembers?.map((am) => {
-          const commission = order.commissions?.find(
+          const singleCommission = order.singleCommission?.find(
             (c) => c.memberId === am.member.id,
           );
           return {
             memberId: am.member.id,
             memberName: am.member.user.name,
-            percentage: commission?.percentage ?? null,
+            percentage: singleCommission?.value ?? null,
           };
         }),
       }));
