@@ -66,12 +66,13 @@ export class OrderController {
       paymentMethod,
       paymentAmount,
       blingProducts,
-      services,
       members,
-      commissionPercent,
       memberCommissions,
       customer,
       showOrder,
+      scheduleDate,
+      scheduleTime,
+      note,
     }: {
       slug: string;
       type: OrderTypes;
@@ -84,13 +85,7 @@ export class OrderController {
         precoCusto: number;
         quantity: number;
       }[];
-      services: {
-        id: string;
-        title: string;
-        price: number;
-      }[];
       members: { id: string; name: string }[];
-      commissionPercent: number;
       memberCommissions: { memberId: string; value: number }[];
       customer: {
         id: string;
@@ -101,6 +96,9 @@ export class OrderController {
         address: string;
       };
       showOrder: boolean;
+      scheduleDate: Date;
+      scheduleTime: Date;
+      note: string;
     },
   ) {
     const user = req.user;
@@ -111,13 +109,14 @@ export class OrderController {
       paymentMethod,
       paymentAmount,
       blingProducts,
-      services,
       members,
-      commissionPercent,
       memberCommissions,
       customer,
       ownerId: user.id,
       showOrder,
+      scheduleDate,
+      scheduleTime,
+      note,
     });
   }
 
@@ -133,9 +132,7 @@ export class OrderController {
       paymentMethod,
       paymentAmount,
       blingProducts,
-      services,
       members,
-      commissionPercent,
       memberCommissions,
       customer,
       showOrder,
@@ -152,13 +149,7 @@ export class OrderController {
         precoCusto: number;
         quantity: number;
       }[];
-      services: {
-        id: string;
-        title: string;
-        price: number;
-      }[];
       members: { id: string; name: string }[];
-      commissionPercent: number;
       memberCommissions: { memberId: string; value: number }[];
       customer: {
         id: string;
@@ -180,9 +171,7 @@ export class OrderController {
       paymentMethod,
       paymentAmount,
       blingProducts,
-      services,
       members,
-      commissionPercent,
       memberCommissions,
       customer,
       ownerId: user.id,
