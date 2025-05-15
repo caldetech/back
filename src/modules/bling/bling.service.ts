@@ -21,7 +21,7 @@ export class BlingService {
     if ('accessToken' in tokens) {
       const products = await ky
         .get('https://api.bling.com.br/Api/v3/produtos', {
-          searchParams: { nome: query.toString(), limite: 3 },
+          searchParams: { nome: `%${query}%`, limite: 10 },
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
             Accept: '1.0',
