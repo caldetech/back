@@ -155,7 +155,7 @@ model Member {
   own_orders          Order[]
   assignedMember AssignedMember[]
   commissionTarget CommissionTarget? @relation("CommissionTarget", fields: [commissionTargetId], references: [id])
-  commissionTargetId String @unique @map("commission_target_id")
+  commissionTargetId String? @unique @map("commission_target_id")
   singleCommission SingleCommission[]
 
   @@unique([id, commissionTargetId])
