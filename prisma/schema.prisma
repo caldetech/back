@@ -27,6 +27,10 @@ model Customer {
   organizationId String        @map("organization_id")
   Order Order[]
 
+  @@index([createdAt])
+  @@index([address])
+  @@index([mainNumber])
+  @@index([name])
   @@unique([mainNumber, organizationId])
   @@map("customers")
 }
@@ -53,6 +57,9 @@ model User {
   member_on          Member[]
   owns_organizations Organization[]
 
+  @@index([status])
+  @@index([email])
+  @@index([name])
   @@map("users")
 }
 
@@ -121,9 +128,10 @@ model CommissionTarget {
   target Boolean @default(false)
   createdAt                 DateTime @default(now()) @map("created_at")
   updatedAt                 DateTime @updatedAt @map("updated_at")
-
-  @@map("commissions_base")
   member Member? @relation("CommissionTarget")
+
+  @@index([updatedAt])
+  @@map("commissions_base")
 }
 
 enum CommissionTargetStatus {
@@ -141,6 +149,8 @@ model SingleCommission {
   orderId String @map("order_id")
   createdAt                 DateTime @default(now()) @map("created_at")
 
+  @@index([createdAt])
+  @@index([flag])
   @@unique([memberid, orderId])
   @@map("single_commissions")
 }
@@ -158,6 +168,7 @@ model Member {
   commissionTargetId String? @unique @map("commission_target_id")
   singleCommission SingleCommission[]
 
+  @@index([role])
   @@unique([id, commissionTargetId])
   @@unique([id, organizationId])
   @@unique([organizationId, userId])
@@ -199,12 +210,12 @@ model ProductOrder {
   id        String   @id @default(uuid())
   quantity  Int
   createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
   order Order @relation(fields: [orderId], references: [id], onDelete: Cascade) 
   orderId String @map("order_id")
   product Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
   productId String? @map("product_id")
 
+  @@index([createdAt])
   @@unique([orderId, productId])
   @@unique([id, orderId])
   @@map("product_orders")
@@ -256,6 +267,10 @@ model Order {
   createdAt   DateTime       @default(now()) @map("created_at")
   updatedAt       DateTime       @updatedAt @map("updated_at")
 
+  @@index([createdAt])
+  @@index([type])
+  @@index([status])
+  @@index([show])
   @@unique([id, descriptionId])
   @@unique([id, paymentId])
   @@unique([id, ownerId])
@@ -289,6 +304,9 @@ model Product {
   organizationId String         @map("organization_id")
   productOrder ProductOrder[]
 
+  @@index([updatedAt])
+  @@index([name])
+  @@index([price])
   @@unique([organizationId, blingId])
   @@map("products")
 }
@@ -341,6 +359,7 @@ model AssignedMember {
   memberId  String   @map("member_id")
   createdAt DateTime @default(now()) @map("created_at")
 
+  @@index([createdAt])
   @@unique([orderId, memberId])
   @@map("assigned_members")
 }
@@ -356,6 +375,10 @@ model PaymentInstallment {
   createdAt  DateTime       @default(now()) @map("created_at")
   updatedAt  DateTime       @updatedAt @map("updated_at")
 
+  @@index([paidAt])
+  @@index([dueDate])
+  @@index([status])
+  @@index([amount])
   @@map("payment_installments")
 }
 
@@ -368,6 +391,9 @@ model PaymentFee {
   createdAt  DateTime  @default(now()) @map("created_at")
   updatedAt  DateTime  @updatedAt @map("updated_at")
 
+  @@index([paidAt])
+  @@index([status])
+  @@index([amount])
   @@map("payment_fees")
 }
 
@@ -386,6 +412,11 @@ model Payment {
   paymentFee   PaymentFee?  @relation("FeeToPayment", fields: [paymentFeeId], references: [id])
   paymentFeeId String      @map("payment_feed_id") @unique
 
+  @@index([updatedAt])
+  @@index([createdAt])
+  @@index([method])
+  @@index([status])
+  @@index([amount])
   @@map("payments")
 }
 
