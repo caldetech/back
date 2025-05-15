@@ -15,8 +15,6 @@ export class OrderRepository {
     paymentMethod,
     paymentAmount,
     blingProducts,
-    services,
-    storedProducts,
     members,
     memberCommissions,
     customer,
@@ -35,19 +33,6 @@ export class OrderRepository {
       preco: number;
       precoCusto: number;
       quantity: number;
-    }[];
-    services: {
-      id: string;
-      title: string;
-      price: number;
-    }[];
-    storedProducts: {
-      id: string;
-      name: string;
-      blingId: BigInt;
-      createdAt: Date;
-      updatedAt: Date;
-      organizationId: string;
     }[];
     members: { id: string; name: string }[];
     memberCommissions: { memberId: string; value: number }[];
@@ -151,8 +136,6 @@ export class OrderRepository {
     paymentMethod,
     paymentAmount,
     blingProducts,
-    services,
-    storedProducts,
     members,
     memberCommissions,
     customer,
@@ -173,19 +156,6 @@ export class OrderRepository {
       preco: number;
       precoCusto: number;
       quantity: number;
-    }[];
-    services: {
-      id: string;
-      title: string;
-      price: number;
-    }[];
-    storedProducts: {
-      id: string;
-      name: string;
-      blingId: BigInt;
-      createdAt: Date;
-      updatedAt: Date;
-      organizationId: string;
     }[];
     members: { id: string; name: string }[];
     memberCommissions: { memberId: string; value: number }[];

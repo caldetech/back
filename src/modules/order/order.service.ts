@@ -56,12 +56,14 @@ export class OrderService {
     paymentMethod,
     paymentAmount,
     blingProducts,
-    services,
     members,
     memberCommissions,
     customer,
     ownerId,
     showOrder,
+    scheduleDate,
+    scheduleTime,
+    note,
   }: {
     slug: string;
     type: OrderTypes;
@@ -73,11 +75,6 @@ export class OrderService {
       preco: number;
       precoCusto: number;
       quantity: number;
-    }[];
-    services: {
-      id: string;
-      title: string;
-      price: number;
     }[];
     members: { id: string; name: string }[];
     memberCommissions: { memberId: string; value: number }[];
@@ -91,6 +88,9 @@ export class OrderService {
     };
     ownerId: string;
     showOrder: boolean;
+    scheduleDate: Date;
+    scheduleTime: Date;
+    note: string;
   }) {
     const organization =
       await this.organizationService.getOrganizationBySlug(slug);
@@ -99,29 +99,21 @@ export class OrderService {
       throw new BadRequestException('Organização não encontrada');
     }
 
-    const storedProducts = await this.productService.createProducts({
-      slug,
-      blingProducts,
-    });
-
-    if (!storedProducts) {
-      throw new BadRequestException('Erro ao armazenar produtos do Bling');
-    }
-
     return this.orderRepository.createOrder({
       slug,
       type,
       paymentMethod,
       paymentAmount,
       blingProducts,
-      services,
-      storedProducts,
       members,
       memberCommissions,
       customer,
       ownerId,
       organizationId: organization.id,
       showOrder,
+      scheduleDate,
+      scheduleTime,
+      note,
     });
   }
 
@@ -132,7 +124,6 @@ export class OrderService {
     paymentMethod,
     paymentAmount,
     blingProducts,
-    services,
     members,
     memberCommissions,
     customer,
@@ -150,11 +141,6 @@ export class OrderService {
       preco: number;
       precoCusto: number;
       quantity: number;
-    }[];
-    services: {
-      id: string;
-      title: string;
-      price: number;
     }[];
     members: { id: string; name: string }[];
     memberCommissions: { memberId: string; value: number }[];
@@ -192,8 +178,6 @@ export class OrderService {
       paymentMethod,
       paymentAmount,
       blingProducts,
-      services,
-      storedProducts,
       members,
       memberCommissions,
       customer,

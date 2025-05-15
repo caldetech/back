@@ -66,11 +66,13 @@ export class OrderController {
       paymentMethod,
       paymentAmount,
       blingProducts,
-      services,
       members,
       memberCommissions,
       customer,
       showOrder,
+      scheduleDate,
+      scheduleTime,
+      note,
     }: {
       slug: string;
       type: OrderTypes;
@@ -83,11 +85,6 @@ export class OrderController {
         precoCusto: number;
         quantity: number;
       }[];
-      services: {
-        id: string;
-        title: string;
-        price: number;
-      }[];
       members: { id: string; name: string }[];
       memberCommissions: { memberId: string; value: number }[];
       customer: {
@@ -99,6 +96,9 @@ export class OrderController {
         address: string;
       };
       showOrder: boolean;
+      scheduleDate: Date;
+      scheduleTime: Date;
+      note: string;
     },
   ) {
     const user = req.user;
@@ -109,12 +109,14 @@ export class OrderController {
       paymentMethod,
       paymentAmount,
       blingProducts,
-      services,
       members,
       memberCommissions,
       customer,
       ownerId: user.id,
       showOrder,
+      scheduleDate,
+      scheduleTime,
+      note,
     });
   }
 
@@ -130,7 +132,6 @@ export class OrderController {
       paymentMethod,
       paymentAmount,
       blingProducts,
-      services,
       members,
       memberCommissions,
       customer,
@@ -147,11 +148,6 @@ export class OrderController {
         preco: number;
         precoCusto: number;
         quantity: number;
-      }[];
-      services: {
-        id: string;
-        title: string;
-        price: number;
       }[];
       members: { id: string; name: string }[];
       memberCommissions: { memberId: string; value: number }[];
@@ -175,7 +171,6 @@ export class OrderController {
       paymentMethod,
       paymentAmount,
       blingProducts,
-      services,
       members,
       memberCommissions,
       customer,
