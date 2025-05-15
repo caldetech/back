@@ -249,8 +249,7 @@ model Order {
   organization    Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   organizationId  String         @map("organization_id")
 
-  description ServiceDescription @relation("OrderDescription", fields: [descriptionId], references: [id])
-  descriptionId String @unique @map("description_id")
+  note ServiceNote[]
 
   customer Customer? @relation(fields: [customerid], references: [id], onDelete: SetNull)
   customerid String? @map("customer_id")
@@ -271,7 +270,6 @@ model Order {
   @@index([type])
   @@index([status])
   @@index([show])
-  @@unique([id, descriptionId])
   @@unique([id, paymentId])
   @@unique([id, ownerId])
   @@unique([id, organizationId])
@@ -311,14 +309,16 @@ model Product {
   @@map("products")
 }
 
-model ServiceDescription {
+model ServiceNote {
   id          String   @id @default(uuid())
-  description String
+  note String
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
-  Order Order? @relation("OrderDescription")
+  order Order @relation(fields: [orderId], references: [id])
+  orderId String
 
-  @@map("description_services")
+  @@index([orderId])
+  @@map("service_notes")
 }
 
 enum PaymentType {
@@ -410,7 +410,7 @@ model Payment {
   installments PaymentInstallment[]
 
   paymentFee   PaymentFee?  @relation("FeeToPayment", fields: [paymentFeeId], references: [id])
-  paymentFeeId String      @map("payment_feed_id") @unique
+  paymentFeeId String      @map("payment_fee_id") @unique
 
   @@index([updatedAt])
   @@index([createdAt])

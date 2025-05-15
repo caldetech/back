@@ -68,7 +68,6 @@ export class OrderController {
       blingProducts,
       services,
       members,
-      commissionPercent,
       memberCommissions,
       customer,
       showOrder,
@@ -90,7 +89,6 @@ export class OrderController {
         price: number;
       }[];
       members: { id: string; name: string }[];
-      commissionPercent: number;
       memberCommissions: { memberId: string; value: number }[];
       customer: {
         id: string;
@@ -113,7 +111,6 @@ export class OrderController {
       blingProducts,
       services,
       members,
-      commissionPercent,
       memberCommissions,
       customer,
       ownerId: user.id,
@@ -135,7 +132,6 @@ export class OrderController {
       blingProducts,
       services,
       members,
-      commissionPercent,
       memberCommissions,
       customer,
       showOrder,
@@ -158,7 +154,6 @@ export class OrderController {
         price: number;
       }[];
       members: { id: string; name: string }[];
-      commissionPercent: number;
       memberCommissions: { memberId: string; value: number }[];
       customer: {
         id: string;
@@ -182,7 +177,6 @@ export class OrderController {
       blingProducts,
       services,
       members,
-      commissionPercent,
       memberCommissions,
       customer,
       ownerId: user.id,

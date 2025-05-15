@@ -18,7 +18,6 @@ export class OrderRepository {
     services,
     storedProducts,
     members,
-    commissionPercent,
     memberCommissions,
     customer,
     ownerId,
@@ -51,7 +50,6 @@ export class OrderRepository {
       organizationId: string;
     }[];
     members: { id: string; name: string }[];
-    commissionPercent: number;
     memberCommissions: { memberId: string; value: number }[];
     customer: {
       id: string;
@@ -70,7 +68,6 @@ export class OrderRepository {
       data: {
         type,
         show: showOrder,
-        commissionPercent,
         organization: {
           connect: { slug },
         },
@@ -87,10 +84,10 @@ export class OrderRepository {
             id: customer.id,
           },
         },
-        commissions: {
+        singleCommission: {
           deleteMany: {},
           create: memberCommissions.map((member) => ({
-            percentage: member.value,
+            value: member.value,
             member: { connect: { id: member.memberId } },
           })),
         },
@@ -121,17 +118,11 @@ export class OrderRepository {
             product: { connect: { blingId: product.id } },
           })),
         },
-        serviceOrder: {
-          deleteMany: {},
-          create: services.map((service) => ({
-            service: { connect: { id: service.id } },
-          })),
-        },
       },
       include: {
         assignedMembers: true,
         payment: true,
-        commissions: true,
+        singleCommission: true,
         productOrder: true,
       },
     });
@@ -163,12 +154,14 @@ export class OrderRepository {
     services,
     storedProducts,
     members,
-    commissionPercent,
     memberCommissions,
     customer,
     ownerId,
     organizationId,
     showOrder,
+    scheduleDate,
+    scheduleTime,
+    description,
   }: {
     slug: string;
     type: OrderTypes;
@@ -195,7 +188,6 @@ export class OrderRepository {
       organizationId: string;
     }[];
     members: { id: string; name: string }[];
-    commissionPercent: number;
     memberCommissions: { memberId: string; value: number }[];
     customer: {
       id: string;
@@ -208,12 +200,17 @@ export class OrderRepository {
     ownerId: string;
     organizationId: string;
     showOrder: boolean;
+    scheduleDate: Date;
+    scheduleTime: Date;
+    description: string;
   }) {
     return this.prisma.order.create({
       data: {
-        commissionPercent,
         type,
         show: showOrder,
+        scheduleDate,
+        scheduleTime,
+        description,
         organization: {
           connect: {
             slug,
@@ -232,10 +229,10 @@ export class OrderRepository {
             id: customer.id,
           },
         },
-        commissions: {
+        singleCommission: {
           create: memberCommissions.map((member) => {
             return {
-              percentage: member.value,
+              value: member.value,
               member: {
                 connect: {
                   id: member.memberId,
@@ -270,17 +267,6 @@ export class OrderRepository {
               product: {
                 connect: {
                   blingId: element.id,
-                },
-              },
-            };
-          }),
-        },
-        serviceOrder: {
-          create: services.map((element) => {
-            return {
-              service: {
-                connect: {
-                  id: element.id,
                 },
               },
             };
@@ -339,24 +325,12 @@ export class OrderRepository {
           status: true,
           orderNumber: true,
           show: true,
-          commissionPercent: true,
           customer: {
             select: {
               id: true,
               name: true,
               address: true,
               customerType: true,
-            },
-          },
-          serviceOrder: {
-            select: {
-              service: {
-                select: {
-                  id: true,
-                  title: true,
-                  price: true,
-                },
-              },
             },
           },
           payment: {
@@ -412,7 +386,6 @@ export class OrderRepository {
         type: z.string(),
         orderNumber: z.number(),
         show: z.boolean(),
-        commissionPercent: z.number(),
         customer: z
           .object({
             id: z.string(),
@@ -460,17 +433,6 @@ export class OrderRepository {
             }),
           )
           .nullable(),
-        serviceOrder: z
-          .array(
-            z.object({
-              service: z.object({
-                id: z.string(),
-                title: z.string(),
-                price: z.number(),
-              }),
-            }),
-          )
-          .nullable(),
         assignedMembers: z
           .array(
             z.object({
@@ -498,7 +460,6 @@ export class OrderRepository {
         type: order.type,
         orderNumber: order.orderNumber,
         show: order.show,
-        commissionPercent: order.commissionPercent,
         customerId: order.customer?.id ?? null,
         customer: order.customer?.name ?? null,
         address: order.customer?.address ?? null,
@@ -517,11 +478,6 @@ export class OrderRepository {
           price: po.product.price,
           costPrice: po.product.costPrice,
           quantity: po.quantity,
-        })),
-        serviceOrder: order.serviceOrder?.map((po) => ({
-          id: po.service.id,
-          title: po.service.title,
-          price: po.service.price,
         })),
         assignedMembers: order.assignedMembers?.map((am) => {
           const commission = order.commissions?.find(

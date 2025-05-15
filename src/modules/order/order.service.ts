@@ -58,7 +58,6 @@ export class OrderService {
     blingProducts,
     services,
     members,
-    commissionPercent,
     memberCommissions,
     customer,
     ownerId,
@@ -81,7 +80,6 @@ export class OrderService {
       price: number;
     }[];
     members: { id: string; name: string }[];
-    commissionPercent: number;
     memberCommissions: { memberId: string; value: number }[];
     customer: {
       id: string;
@@ -119,7 +117,6 @@ export class OrderService {
       services,
       storedProducts,
       members,
-      commissionPercent,
       memberCommissions,
       customer,
       ownerId,
@@ -137,7 +134,6 @@ export class OrderService {
     blingProducts,
     services,
     members,
-    commissionPercent,
     memberCommissions,
     customer,
     ownerId,
@@ -161,7 +157,6 @@ export class OrderService {
       price: number;
     }[];
     members: { id: string; name: string }[];
-    commissionPercent: number;
     memberCommissions: { memberId: string; value: number }[];
     customer: {
       id: string;
@@ -200,7 +195,6 @@ export class OrderService {
       services,
       storedProducts,
       members,
-      commissionPercent,
       memberCommissions,
       customer,
       ownerId,

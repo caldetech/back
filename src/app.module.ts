@@ -19,6 +19,7 @@ import { ProductModule } from './modules/product/product.module';
 import { AttachmentModule } from './modules/attachment/attachment.module';
 import { S3Module } from './modules/s3/s3.module';
 import { ConfigModule } from '@nestjs/config';
+import { CommissionModule } from './modules/commission/commission.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { ConfigModule } from '@nestjs/config';
     ProductModule,
     AttachmentModule,
     S3Module,
+    CommissionModule,
   ],
   controllers: [AppController],
   providers: [AppService],
