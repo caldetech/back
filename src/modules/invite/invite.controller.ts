@@ -1,9 +1,11 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Post,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -37,7 +39,25 @@ export class InviteController {
       slug,
       role,
       email,
-      authorId: user.id,
+      memberId: user.id,
+    });
+  }
+
+  @Get('/all')
+  @UseGuards(AuthGuard)
+  async getInvites(
+    @Request() req,
+    @Query('page') page: number,
+    @Query('limit') limit: number,
+    @Query('slug') slug: string,
+  ) {
+    const user = req.user;
+
+    return await this.inviteService.getInvites({
+      page,
+      limit,
+      slug,
+      memberId: user.id,
     });
   }
 }

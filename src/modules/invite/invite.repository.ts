@@ -58,12 +58,12 @@ export class InviteRepository {
   async createInvite({
     email,
     role,
-    authorId,
+    memberId,
     organizationId,
   }: {
     email: string;
     role: Role;
-    authorId: string;
+    memberId: string;
     organizationId: string;
   }) {
     try {
@@ -71,7 +71,7 @@ export class InviteRepository {
         data: {
           email,
           role,
-          authorId,
+          memberId,
           organizationId,
         },
       });
@@ -79,6 +79,50 @@ export class InviteRepository {
       return invite;
     } catch (error) {
       console.log(error);
+    }
+  }
+
+  async getInvites({
+    page,
+    limit,
+    slug,
+    memberId,
+  }: {
+    page: number;
+    limit: number;
+    slug: string;
+    memberId: string;
+  }) {
+    try {
+      const skip = (page - 1) * limit;
+
+      const invites = await this.prisma.invite.findMany({
+        skip,
+        take: limit,
+        where: {
+          memberId,
+        },
+        select: {
+          id: true,
+          email: true,
+        },
+      });
+
+      const total = await this.prisma.invite.count({
+        where: {
+          memberId,
+        },
+      });
+
+      return {
+        data: invites,
+        page: {
+          total,
+        },
+      };
+    } catch (error) {
+      console.error(error.message);
+      throw error;
     }
   }
 }

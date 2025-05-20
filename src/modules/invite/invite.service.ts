@@ -50,12 +50,12 @@ export class InviteService {
     slug,
     role,
     email,
-    authorId,
+    memberId,
   }: {
     role: Role;
     slug: string;
     email: string;
-    authorId: string;
+    memberId: string;
   }) {
     const organization =
       await this.organizationService.getOrganizationBySlug(slug);
@@ -102,7 +102,7 @@ export class InviteService {
     const invite = await this.inviteRepository.createInvite({
       role,
       email,
-      authorId,
+      memberId,
       organizationId: organization.id,
     });
 
@@ -124,5 +124,27 @@ export class InviteService {
       success: true,
       message: 'Convite enviado com sucesso',
     };
+  }
+
+  async getInvites({
+    page,
+    limit,
+    slug,
+    memberId,
+  }: {
+    page: number;
+    limit: number;
+    slug: string;
+    memberId: string;
+  }) {
+    const numericPage = Number(page);
+    const numericLimit = Number(limit);
+
+    return await this.inviteRepository.getInvites({
+      page: numericPage,
+      limit: numericLimit,
+      slug,
+      memberId,
+    });
   }
 }
