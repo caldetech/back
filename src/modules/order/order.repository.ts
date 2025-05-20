@@ -52,23 +52,6 @@ export class OrderRepository {
     date: Date;
     note: string;
   }) {
-    console.log({
-      orderId,
-      slug,
-      orderType,
-      paymentMethod,
-      paymentAmount,
-      blingProducts,
-      members,
-      customer,
-      ownerId,
-      organizationId,
-      showOrder,
-      service,
-      date,
-      note,
-    });
-
     return this.prisma.order.update({
       where: { id: orderId },
       data: {
