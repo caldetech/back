@@ -260,7 +260,7 @@ model Order {
   customerId String? @map("customer_id")
 
   payment        Payment? @relation("Payment", fields: [paymentId], references: [id])
-  paymentId String @map("payment_id") @unique
+  paymentId String? @map("payment_id") @unique
 
   orderAttachment OrderAttachment[]
 
