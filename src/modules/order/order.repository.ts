@@ -11,20 +11,22 @@ export class OrderRepository {
   async updateOrder({
     orderId,
     slug,
-    type,
+    orderType,
     paymentMethod,
     paymentAmount,
     blingProducts,
     members,
-    memberCommissions,
     customer,
     ownerId,
     organizationId,
     showOrder,
+    service,
+    date,
+    note,
   }: {
     orderId: string;
     slug: string;
-    type: OrderTypes;
+    orderType: OrderTypes;
     paymentMethod: paymentMethodTypes;
     paymentAmount?: number;
     blingProducts: {
@@ -35,7 +37,6 @@ export class OrderRepository {
       quantity: number;
     }[];
     members: { id: string; name: string }[];
-    memberCommissions: { memberId: string; value: number }[];
     customer: {
       id: string;
       customerType: CustomerTypes;
@@ -47,11 +48,34 @@ export class OrderRepository {
     ownerId: string;
     organizationId: string;
     showOrder: boolean;
+    service: string;
+    date: Date;
+    note: string;
   }) {
+    console.log({
+      orderId,
+      slug,
+      orderType,
+      paymentMethod,
+      paymentAmount,
+      blingProducts,
+      members,
+      customer,
+      ownerId,
+      organizationId,
+      showOrder,
+      service,
+      date,
+      note,
+    });
+
     return this.prisma.order.update({
       where: { id: orderId },
       data: {
-        type,
+        type: orderType,
+        service,
+        note,
+        scheduling: date,
         show: showOrder,
         organization: {
           connect: { slug },
@@ -68,13 +92,6 @@ export class OrderRepository {
           connect: {
             id: customer.id,
           },
-        },
-        singleCommission: {
-          deleteMany: {},
-          create: memberCommissions.map((member) => ({
-            value: member.value,
-            member: { connect: { id: member.memberId } },
-          })),
         },
         payment: paymentAmount
           ? {
@@ -104,12 +121,6 @@ export class OrderRepository {
           })),
         },
       },
-      include: {
-        assignedMembers: true,
-        payment: true,
-        singleCommission: true,
-        productOrder: true,
-      },
     });
   }
 
@@ -137,13 +148,12 @@ export class OrderRepository {
     paymentAmount,
     blingProducts,
     members,
-    memberCommissions,
     customer,
     ownerId,
     organizationId,
+    service,
     showOrder,
-    scheduleDate,
-    scheduleTime,
+    date,
     note,
   }: {
     slug: string;
@@ -157,8 +167,8 @@ export class OrderRepository {
       precoCusto: number;
       quantity: number;
     }[];
+    service: string;
     members: { id: string; name: string }[];
-    memberCommissions: { memberId: string; value: number }[];
     customer: {
       id: string;
       customerType: CustomerTypes;
@@ -170,21 +180,16 @@ export class OrderRepository {
     ownerId: string;
     organizationId: string;
     showOrder: boolean;
-    scheduleDate: Date;
-    scheduleTime: Date;
     note: string;
+    date: Date;
   }) {
     return this.prisma.order.create({
       data: {
         type,
         show: showOrder,
-        scheduleDate,
-        scheduleTime,
-        note: {
-          create: {
-            note,
-          },
-        },
+        note,
+        service,
+        scheduling: date,
         organization: {
           connect: {
             slug,
@@ -202,18 +207,6 @@ export class OrderRepository {
           connect: {
             id: customer.id,
           },
-        },
-        singleCommission: {
-          create: memberCommissions.map((member) => {
-            return {
-              value: member.value,
-              member: {
-                connect: {
-                  id: member.memberId,
-                },
-              },
-            };
-          }),
         },
         payment: {
           create: paymentAmount
@@ -239,19 +232,21 @@ export class OrderRepository {
             return {
               quantity: element.quantity,
               product: {
-                connect: {
+                create: {
                   blingId: element.id,
+                  name: element.nome,
+                  price: element.preco,
+                  costPrice: element.precoCusto,
+                  organization: {
+                    connect: {
+                      slug,
+                    },
+                  },
                 },
               },
             };
           }),
         },
-      },
-      include: {
-        assignedMembers: true,
-        payment: true,
-        singleCommission: true,
-        productOrder: true,
       },
     });
   }
@@ -298,6 +293,9 @@ export class OrderRepository {
           type: true,
           status: true,
           orderNumber: true,
+          scheduling: true,
+          service: true,
+          note: true,
           show: true,
           customer: {
             select: {
@@ -342,12 +340,6 @@ export class OrderRepository {
               },
             },
           },
-          singleCommission: {
-            select: {
-              value: true,
-              memberid: true,
-            },
-          },
         },
       });
 
@@ -359,6 +351,9 @@ export class OrderRepository {
         id: z.string(),
         type: z.string(),
         orderNumber: z.number(),
+        scheduling: z.date(),
+        note: z.string(),
+        service: z.string(),
         show: z.boolean(),
         customer: z
           .object({
@@ -383,17 +378,19 @@ export class OrderRepository {
           })
           .nullable(),
         status: z.string(),
-        orderAttachment: z.array(
-          z.object({
-            id: z.string(),
-            orderId: z.string(),
-            filename: z.string(),
-            url: z.string(),
-            mimetype: z.string(),
-            size: z.number(),
-            createdAt: z.date(),
-          }),
-        ),
+        orderAttachment: z
+          .array(
+            z.object({
+              id: z.string(),
+              orderId: z.string(),
+              filename: z.string(),
+              url: z.string(),
+              mimetype: z.string(),
+              size: z.number(),
+              createdAt: z.date(),
+            }),
+          )
+          .nullable(),
         productOrder: z
           .array(
             z.object({
@@ -419,20 +416,15 @@ export class OrderRepository {
             }),
           )
           .nullable(),
-        singleCommission: z
-          .array(
-            z.object({
-              value: z.number(),
-              memberId: z.string(),
-            }),
-          )
-          .optional(),
       });
 
       const orderDTOSchema = rawOrderSchema.transform((order) => ({
         id: order.id,
         type: order.type,
         orderNumber: order.orderNumber,
+        scheduling: order.scheduling,
+        note: order.note,
+        service: order.service,
         show: order.show,
         customerId: order.customer?.id ?? null,
         customer: order.customer?.name ?? null,
@@ -454,13 +446,9 @@ export class OrderRepository {
           quantity: po.quantity,
         })),
         assignedMembers: order.assignedMembers?.map((am) => {
-          const singleCommission = order.singleCommission?.find(
-            (c) => c.memberId === am.member.id,
-          );
           return {
             memberId: am.member.id,
             memberName: am.member.user.name,
-            percentage: singleCommission?.value ?? null,
           };
         }),
       }));

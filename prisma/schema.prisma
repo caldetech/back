@@ -143,15 +143,15 @@ model SingleCommission {
   id String @id @default(uuid())
   value Int
   flag CommissionTargetStatus @default(CURRENT)
-  member Member @relation(fields: [memberid], references: [id])
-  memberid String @map("member_id")
+  member Member @relation(fields: [memberId], references: [id])
+  memberId String @map("member_id")
   order Order @relation(fields: [orderId], references: [id])
   orderId String @map("order_id")
   createdAt                 DateTime @default(now()) @map("created_at")
 
   @@index([createdAt])
   @@index([flag])
-  @@unique([memberid, orderId])
+  @@unique([memberId, orderId])
   @@map("single_commissions")
 }
 
@@ -240,8 +240,9 @@ model Order {
   status OrderStatus @default(OPEN)
   show Boolean @default(true)
 
-  scheduleDate DateTime @map("schedule_date")
-  scheduleTime DateTime @map("schedule_time")
+  scheduling DateTime
+  service String
+  note String
 
   owner          Member?         @relation(fields: [ownerId], references: [id], onDelete: SetNull)
   ownerId         String?         @map("owner_id")
@@ -249,18 +250,16 @@ model Order {
   organization    Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   organizationId  String         @map("organization_id")
 
-  note ServiceNote[]
-
-  customer Customer? @relation(fields: [customerid], references: [id], onDelete: SetNull)
-  customerid String? @map("customer_id")
+  customer Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  customerId String? @map("customer_id")
 
   payment        Payment? @relation("Payment", fields: [paymentId], references: [id])
-  paymentId String? @map("payment_id") @unique
+  paymentId String @map("payment_id") @unique
+
+  orderAttachment OrderAttachment[]
 
   productOrder ProductOrder[]
   assignedMembers AssignedMember[]
-  orderAttachment OrderAttachment? @relation("OrderAttachment", fields: [orderAttachmentId], references: [id])
-  orderAttachmentId String? @unique @map("order_attachment_id")
   singleCommission SingleCommission[]
 
   createdAt   DateTime       @default(now()) @map("created_at")
@@ -278,13 +277,13 @@ model Order {
 
 model OrderAttachment {
   id         String   @id @default(uuid())
-  order      Order?    @relation("OrderAttachment")
-  orderId    String?   @map("order_id") @unique
   filename   String   // Nome original do arquivo
   url        String   // URL do S3 
   mimetype   String   // Ex: "application/pdf"
   size       Int      // Em bytes
   createdAt  DateTime @default(now()) @map("created_at")
+  order Order? @relation(fields: [orderId], references: [id])
+  orderId String? @unique
 
   @@map("order_attachments")
 }
@@ -307,18 +306,6 @@ model Product {
   @@index([price])
   @@unique([organizationId, blingId])
   @@map("products")
-}
-
-model ServiceNote {
-  id          String   @id @default(uuid())
-  note String
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-  order Order @relation(fields: [orderId], references: [id])
-  orderId String
-
-  @@index([orderId])
-  @@map("service_notes")
 }
 
 enum PaymentType {
@@ -387,9 +374,9 @@ model PaymentFee {
   amount     Float
   status     PaymentStatus @default(PENDING)
   paidAt     DateTime? @map("paid_at")
-  payment    Payment?   @relation("FeeToPayment")
   createdAt  DateTime  @default(now()) @map("created_at")
   updatedAt  DateTime  @updatedAt @map("updated_at")
+  Payment Payment[]
 
   @@index([paidAt])
   @@index([status])
@@ -409,8 +396,8 @@ model Payment {
   order        Order? @relation("Payment")
   installments PaymentInstallment[]
 
-  paymentFee   PaymentFee?  @relation("FeeToPayment", fields: [paymentFeeId], references: [id])
-  paymentFeeId String      @map("payment_fee_id") @unique
+  paymentFee   PaymentFee? @relation(fields: [paymentFeeid], references: [id])
+  paymentFeeid String?
 
   @@index([updatedAt])
   @@index([createdAt])
