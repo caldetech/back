@@ -66,13 +66,12 @@ export class OrderController {
       paymentMethod,
       paymentAmount,
       blingProducts,
+      service,
+      note,
       members,
-      memberCommissions,
       customer,
       showOrder,
-      scheduleDate,
-      scheduleTime,
-      note,
+      date,
     }: {
       slug: string;
       type: OrderTypes;
@@ -85,8 +84,8 @@ export class OrderController {
         precoCusto: number;
         quantity: number;
       }[];
+      service: string;
       members: { id: string; name: string }[];
-      memberCommissions: { memberId: string; value: number }[];
       customer: {
         id: string;
         customerType: CustomerTypes;
@@ -96,8 +95,7 @@ export class OrderController {
         address: string;
       };
       showOrder: boolean;
-      scheduleDate: Date;
-      scheduleTime: Date;
+      date: Date;
       note: string;
     },
   ) {
@@ -109,14 +107,13 @@ export class OrderController {
       paymentMethod,
       paymentAmount,
       blingProducts,
-      members,
-      memberCommissions,
-      customer,
-      ownerId: user.id,
-      showOrder,
-      scheduleDate,
-      scheduleTime,
+      service,
       note,
+      members,
+      customer,
+      showOrder,
+      date,
+      ownerId: user.id,
     });
   }
 
@@ -128,18 +125,20 @@ export class OrderController {
     {
       orderId,
       slug,
-      type,
+      orderType,
       paymentMethod,
       paymentAmount,
       blingProducts,
       members,
-      memberCommissions,
       customer,
       showOrder,
+      service,
+      date,
+      note,
     }: {
       orderId: string;
       slug: string;
-      type: OrderTypes;
+      orderType: OrderTypes;
       paymentMethod: paymentMethodTypes;
       paymentAmount?: number;
       blingProducts: {
@@ -150,7 +149,6 @@ export class OrderController {
         quantity: number;
       }[];
       members: { id: string; name: string }[];
-      memberCommissions: { memberId: string; value: number }[];
       customer: {
         id: string;
         customerType: CustomerTypes;
@@ -160,6 +158,9 @@ export class OrderController {
         address: string;
       };
       showOrder: boolean;
+      service: string;
+      date: Date;
+      note: string;
     },
   ) {
     const user = req.user;
@@ -167,15 +168,17 @@ export class OrderController {
     return this.orderService.updateOrder({
       orderId,
       slug,
-      type,
+      orderType,
       paymentMethod,
       paymentAmount,
       blingProducts,
       members,
-      memberCommissions,
       customer,
       ownerId: user.id,
       showOrder,
+      service,
+      date,
+      note,
     });
   }
 }

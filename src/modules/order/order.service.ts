@@ -56,14 +56,13 @@ export class OrderService {
     paymentMethod,
     paymentAmount,
     blingProducts,
+    service,
+    note,
     members,
-    memberCommissions,
     customer,
     ownerId,
     showOrder,
-    scheduleDate,
-    scheduleTime,
-    note,
+    date,
   }: {
     slug: string;
     type: OrderTypes;
@@ -77,7 +76,7 @@ export class OrderService {
       quantity: number;
     }[];
     members: { id: string; name: string }[];
-    memberCommissions: { memberId: string; value: number }[];
+    service: string;
     customer: {
       id: string;
       customerType: CustomerTypes;
@@ -88,8 +87,7 @@ export class OrderService {
     };
     ownerId: string;
     showOrder: boolean;
-    scheduleDate: Date;
-    scheduleTime: Date;
+    date: Date;
     note: string;
   }) {
     const organization =
@@ -106,13 +104,12 @@ export class OrderService {
       paymentAmount,
       blingProducts,
       members,
-      memberCommissions,
       customer,
       ownerId,
       organizationId: organization.id,
+      service,
       showOrder,
-      scheduleDate,
-      scheduleTime,
+      date,
       note,
     });
   }
@@ -120,19 +117,21 @@ export class OrderService {
   async updateOrder({
     orderId,
     slug,
-    type,
+    orderType,
     paymentMethod,
     paymentAmount,
     blingProducts,
     members,
-    memberCommissions,
     customer,
     ownerId,
     showOrder,
+    service,
+    date,
+    note,
   }: {
     orderId: string;
     slug: string;
-    type: OrderTypes;
+    orderType: OrderTypes;
     paymentMethod: paymentMethodTypes;
     paymentAmount?: number;
     blingProducts: {
@@ -143,7 +142,6 @@ export class OrderService {
       quantity: number;
     }[];
     members: { id: string; name: string }[];
-    memberCommissions: { memberId: string; value: number }[];
     customer: {
       id: string;
       customerType: CustomerTypes;
@@ -154,6 +152,9 @@ export class OrderService {
     };
     ownerId: string;
     showOrder: boolean;
+    service: string;
+    date: Date;
+    note: string;
   }) {
     const organization =
       await this.organizationService.getOrganizationBySlug(slug);
@@ -174,16 +175,18 @@ export class OrderService {
     return this.orderRepository.updateOrder({
       orderId,
       slug,
-      type,
+      orderType,
       paymentMethod,
       paymentAmount,
       blingProducts,
       members,
-      memberCommissions,
       customer,
       ownerId,
       organizationId: organization.id,
       showOrder,
+      service,
+      date,
+      note,
     });
   }
 }
