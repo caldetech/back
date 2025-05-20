@@ -166,22 +166,6 @@ export class OrderRepository {
     note: string;
     date: Date;
   }) {
-    console.log({
-      slug,
-      type,
-      paymentMethod,
-      paymentAmount,
-      blingProducts,
-      members,
-      customer,
-      ownerId,
-      organizationId,
-      service,
-      showOrder,
-      date,
-      note,
-    });
-
     return this.prisma.order.create({
       data: {
         type,
