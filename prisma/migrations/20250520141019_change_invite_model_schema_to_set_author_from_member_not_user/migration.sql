@@ -170,7 +170,6 @@ CREATE TABLE "orders" (
     "organization_id" TEXT NOT NULL,
     "customer_id" TEXT,
     "payment_id" TEXT NOT NULL,
-    "orderAttachmentId" TEXT,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
@@ -185,6 +184,7 @@ CREATE TABLE "order_attachments" (
     "mimetype" TEXT NOT NULL,
     "size" INTEGER NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "orderId" TEXT,
 
     CONSTRAINT "order_attachments_pkey" PRIMARY KEY ("id")
 );
@@ -375,6 +375,9 @@ CREATE UNIQUE INDEX "orders_id_owner_id_key" ON "orders"("id", "owner_id");
 CREATE UNIQUE INDEX "orders_id_organization_id_key" ON "orders"("id", "organization_id");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "order_attachments_orderId_key" ON "order_attachments"("orderId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "products_bling_id_key" ON "products"("bling_id");
 
 -- CreateIndex
@@ -444,7 +447,7 @@ ALTER TABLE "tokens" ADD CONSTRAINT "tokens_user_id_fkey" FOREIGN KEY ("user_id"
 ALTER TABLE "accounts" ADD CONSTRAINT "accounts_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "invites" ADD CONSTRAINT "invites_author_id_fkey" FOREIGN KEY ("author_id") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "invites" ADD CONSTRAINT "invites_author_id_fkey" FOREIGN KEY ("author_id") REFERENCES "members"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "invites" ADD CONSTRAINT "invites_organization_id_fkey" FOREIGN KEY ("organization_id") REFERENCES "organizations"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -486,7 +489,7 @@ ALTER TABLE "orders" ADD CONSTRAINT "orders_customer_id_fkey" FOREIGN KEY ("cust
 ALTER TABLE "orders" ADD CONSTRAINT "orders_payment_id_fkey" FOREIGN KEY ("payment_id") REFERENCES "payments"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "orders" ADD CONSTRAINT "orders_orderAttachmentId_fkey" FOREIGN KEY ("orderAttachmentId") REFERENCES "order_attachments"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "order_attachments" ADD CONSTRAINT "order_attachments_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "orders"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "products" ADD CONSTRAINT "products_organization_id_fkey" FOREIGN KEY ("organization_id") REFERENCES "organizations"("id") ON DELETE CASCADE ON UPDATE CASCADE;

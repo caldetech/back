@@ -23,11 +23,16 @@ export class MemberService {
   }
 
   async createMember({ userId, role, organizationId }) {
-    return await this.memberRepository.createMember({
+    const member = await this.memberRepository.createMember({
       userId,
       role,
       organizationId,
     });
+
+    if (member) {
+    }
+
+    return member;
   }
 
   async getMemberByEmailAndOrganizationId({

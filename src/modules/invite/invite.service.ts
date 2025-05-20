@@ -25,6 +25,10 @@ export class InviteService {
     private readonly emailService: EmailService,
   ) {}
 
+  async updateInviteStatus(id: string) {
+    return await this.inviteRepository.updateInviteStatus(id);
+  }
+
   async deleteinviteById({ inviteId }: { inviteId: string }) {
     return await this.inviteRepository.deleteinviteById({ inviteId });
   }
@@ -50,12 +54,12 @@ export class InviteService {
     slug,
     role,
     email,
-    authorId,
+    memberId,
   }: {
     role: Role;
     slug: string;
     email: string;
-    authorId: string;
+    memberId: string;
   }) {
     const organization =
       await this.organizationService.getOrganizationBySlug(slug);
@@ -75,15 +79,6 @@ export class InviteService {
       );
     }
 
-    const isInvitation = await this.getInviteByEmailAndOrganizationId({
-      email,
-      organizationId: organization.id,
-    });
-
-    if (isInvitation) {
-      await this.deleteinviteById({ inviteId: isInvitation.id });
-    }
-
     const user = await this.userService.getUserByEmail(email);
 
     if (user) {
@@ -99,10 +94,19 @@ export class InviteService {
       };
     }
 
+    const isInvitation = await this.getInviteByEmailAndOrganizationId({
+      email,
+      organizationId: organization.id,
+    });
+
+    if (isInvitation) {
+      await this.deleteinviteById({ inviteId: isInvitation.id });
+    }
+
     const invite = await this.inviteRepository.createInvite({
       role,
       email,
-      authorId,
+      memberId,
       organizationId: organization.id,
     });
 
@@ -124,5 +128,27 @@ export class InviteService {
       success: true,
       message: 'Convite enviado com sucesso',
     };
+  }
+
+  async getInvites({
+    page,
+    limit,
+    slug,
+    memberId,
+  }: {
+    page: number;
+    limit: number;
+    slug: string;
+    memberId: string;
+  }) {
+    const numericPage = Number(page);
+    const numericLimit = Number(limit);
+
+    return await this.inviteRepository.getInvites({
+      page: numericPage,
+      limit: numericLimit,
+      slug,
+      memberId,
+    });
   }
 }
