@@ -102,6 +102,11 @@ enum Role {
   MEMBER
   BILLING
   MANAGER
+}  
+
+enum InviteStatus {
+  ACCEPTED
+  PENDING
 }
 
 model Invite {
@@ -109,6 +114,7 @@ model Invite {
   email     String
   role      Role
   createdAt DateTime @default(now()) @map("created_at")
+  status InviteStatus @default(PENDING)
 
   member   Member   @relation(fields: [memberId], references: [id])
   memberId String @map("member_id")

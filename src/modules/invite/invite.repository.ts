@@ -6,6 +6,21 @@ import { Role } from 'src/schemas/role';
 export class InviteRepository {
   constructor(private readonly prisma: PrismaService) {}
 
+  async updateInviteStatus(id: string) {
+    try {
+      return await this.prisma.invite.update({
+        where: {
+          id,
+        },
+        data: {
+          status: 'ACCEPTED',
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   async deleteinviteById({ inviteId }: { inviteId: string }) {
     try {
       return await this.prisma.invite.delete({
@@ -75,7 +90,6 @@ export class InviteRepository {
           organizationId,
         },
       });
-
       return invite;
     } catch (error) {
       console.log(error);
@@ -105,6 +119,7 @@ export class InviteRepository {
         select: {
           id: true,
           email: true,
+          status: true,
         },
       });
 

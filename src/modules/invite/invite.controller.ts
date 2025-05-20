@@ -13,7 +13,7 @@ import { InviteService } from './invite.service';
 import { Role } from 'src/schemas/role';
 import { AuthGuard } from '../auth/auth.guard';
 
-@Controller('/invite')
+@Controller('/invites')
 export class InviteController {
   constructor(private readonly inviteService: InviteService) {}
 
@@ -21,43 +21,40 @@ export class InviteController {
   @HttpCode(HttpStatus.CREATED)
   @UseGuards(AuthGuard)
   async createInvite(
-    @Request() req,
     @Body()
     {
       email,
       role,
       slug,
+      memberId,
     }: {
       email: string;
       role: Role;
       slug: string;
+      memberId: string;
     },
   ) {
-    const user = req.user;
-
     await this.inviteService.createInvite({
       slug,
       role,
       email,
-      memberId: user.id,
+      memberId,
     });
   }
 
-  @Get('/all')
+  @Get('/get-all')
   @UseGuards(AuthGuard)
   async getInvites(
-    @Request() req,
     @Query('page') page: number,
     @Query('limit') limit: number,
     @Query('slug') slug: string,
+    @Query('memberId') memberId: string,
   ) {
-    const user = req.user;
-
     return await this.inviteService.getInvites({
       page,
       limit,
       slug,
-      memberId: user.id,
+      memberId,
     });
   }
 }

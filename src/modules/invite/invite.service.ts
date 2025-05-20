@@ -25,6 +25,10 @@ export class InviteService {
     private readonly emailService: EmailService,
   ) {}
 
+  async updateInviteStatus(id: string) {
+    return await this.inviteRepository.updateInviteStatus(id);
+  }
+
   async deleteinviteById({ inviteId }: { inviteId: string }) {
     return await this.inviteRepository.deleteinviteById({ inviteId });
   }
@@ -75,15 +79,6 @@ export class InviteService {
       );
     }
 
-    const isInvitation = await this.getInviteByEmailAndOrganizationId({
-      email,
-      organizationId: organization.id,
-    });
-
-    if (isInvitation) {
-      await this.deleteinviteById({ inviteId: isInvitation.id });
-    }
-
     const user = await this.userService.getUserByEmail(email);
 
     if (user) {
@@ -97,6 +92,15 @@ export class InviteService {
         success: true,
         message: 'Usuário adicionado a organização',
       };
+    }
+
+    const isInvitation = await this.getInviteByEmailAndOrganizationId({
+      email,
+      organizationId: organization.id,
+    });
+
+    if (isInvitation) {
+      await this.deleteinviteById({ inviteId: isInvitation.id });
     }
 
     const invite = await this.inviteRepository.createInvite({
