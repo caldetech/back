@@ -215,14 +215,19 @@ export class OrderRepository {
             return {
               quantity: element.quantity,
               product: {
-                create: {
-                  blingId: element.id,
-                  name: element.nome,
-                  price: element.preco,
-                  costPrice: element.precoCusto,
-                  organization: {
-                    connect: {
-                      slug,
+                connectOrCreate: {
+                  where: {
+                    blingId: element.id,
+                  },
+                  create: {
+                    blingId: element.id,
+                    name: element.nome,
+                    price: element.preco,
+                    costPrice: element.precoCusto,
+                    organization: {
+                      connect: {
+                        slug,
+                      },
                     },
                   },
                 },

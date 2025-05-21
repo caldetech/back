@@ -218,8 +218,8 @@ model ProductOrder {
   createdAt DateTime @default(now()) @map("created_at")
   order Order @relation(fields: [orderId], references: [id], onDelete: Cascade) 
   orderId String @map("order_id")
-  product Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
-  productId String? @map("product_id")
+  product Product @relation(fields: [productId], references: [id])
+  productId String @map("product_id")
 
   @@index([createdAt])
   @@unique([orderId, productId])
@@ -310,7 +310,6 @@ model Product {
   @@index([updatedAt])
   @@index([name])
   @@index([price])
-  @@unique([organizationId, blingId])
   @@map("products")
 }
 
