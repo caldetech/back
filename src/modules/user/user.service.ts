@@ -105,7 +105,6 @@ export class UserService {
 
     if (confirmedAccount) {
       await this.tokenService.deleteToken(tokenId);
-      await this.inviteService.updateInviteStatus(confirmedAccount.email);
     }
 
     return confirmedAccount;
@@ -138,6 +137,11 @@ export class UserService {
               passwordHash,
               role: invite.role,
               inviteId: invite.id,
+              organizationId: invite.organizationId,
+            });
+
+            await this.inviteService.updateInviteStatus({
+              email,
               organizationId: invite.organizationId,
             });
 

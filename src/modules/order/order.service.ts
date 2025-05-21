@@ -66,16 +66,16 @@ export class OrderService {
   }: {
     slug: string;
     type: OrderTypes;
-    paymentMethod: paymentMethodTypes;
+    paymentMethod?: paymentMethodTypes;
     paymentAmount?: number;
-    blingProducts: {
+    blingProducts?: {
       id: string;
       nome: string;
       preco: number;
       precoCusto: number;
       quantity: number;
     }[];
-    members: { id: string; name: string }[];
+    members?: { id: string; name: string }[];
     service: string;
     customer: {
       id: string;
@@ -88,7 +88,7 @@ export class OrderService {
     ownerId: string;
     showOrder: boolean;
     date: Date;
-    note: string;
+    note?: string;
   }) {
     const organization =
       await this.organizationService.getOrganizationBySlug(slug);

@@ -90,6 +90,11 @@ export class CustomerRepository {
       const skip = (page - 1) * limit;
 
       const customers = await this.prisma.customer.findMany({
+        orderBy: [
+          {
+            createdAt: 'desc',
+          },
+        ],
         skip,
         take: limit,
         where: {

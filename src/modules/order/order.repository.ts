@@ -98,9 +98,9 @@ export class OrderRepository {
         },
         productOrder: {
           deleteMany: {},
-          create: blingProducts.map((product) => ({
-            quantity: product.quantity,
-            product: { connect: { blingId: product.id } },
+          create: blingProducts.map(({ id, quantity }) => ({
+            quantity,
+            product: { connect: { blingId: BigInt(id) } },
           })),
         },
       },
@@ -141,9 +141,9 @@ export class OrderRepository {
   }: {
     slug: string;
     type: OrderTypes;
-    paymentMethod: paymentMethodTypes;
+    paymentMethod?: paymentMethodTypes;
     paymentAmount?: number;
-    blingProducts: {
+    blingProducts?: {
       id: string;
       nome: string;
       preco: number;
@@ -151,7 +151,7 @@ export class OrderRepository {
       quantity: number;
     }[];
     service: string;
-    members: { id: string; name: string }[];
+    members?: { id: string; name: string }[];
     customer: {
       id: string;
       customerType: CustomerTypes;
@@ -163,7 +163,7 @@ export class OrderRepository {
     ownerId: string;
     organizationId: string;
     showOrder: boolean;
-    note: string;
+    note?: string;
     date: Date;
   }) {
     return this.prisma.order.create({
@@ -192,15 +192,16 @@ export class OrderRepository {
           },
         },
         payment: {
-          create: paymentAmount
-            ? {
-                amount: paymentAmount,
-                method: paymentMethod,
-              }
-            : undefined,
+          create:
+            paymentAmount && paymentMethod
+              ? {
+                  amount: paymentAmount,
+                  method: paymentMethod,
+                }
+              : undefined,
         },
         assignedMembers: {
-          create: members.map((element) => {
+          create: (members ?? []).map((element) => {
             return {
               member: {
                 connect: {
@@ -211,16 +212,16 @@ export class OrderRepository {
           }),
         },
         productOrder: {
-          create: blingProducts.map((element) => {
+          create: (blingProducts ?? []).map((element) => {
             return {
               quantity: element.quantity,
               product: {
                 connectOrCreate: {
                   where: {
-                    blingId: element.id,
+                    blingId: BigInt(element.id),
                   },
                   create: {
-                    blingId: element.id,
+                    blingId: BigInt(element.id),
                     name: element.nome,
                     price: element.preco,
                     costPrice: element.precoCusto,
@@ -273,6 +274,11 @@ export class OrderRepository {
           };
 
       const orders = await this.prisma.order.findMany({
+        orderBy: [
+          {
+            createdAt: 'desc',
+          },
+        ],
         skip,
         take: limit,
         where: whereClause,
@@ -340,7 +346,7 @@ export class OrderRepository {
         type: z.string(),
         orderNumber: z.number(),
         scheduling: z.date(),
-        note: z.string(),
+        note: z.string().nullable(),
         service: z.string(),
         show: z.boolean(),
         customer: z
@@ -411,7 +417,7 @@ export class OrderRepository {
         type: order.type,
         orderNumber: order.orderNumber,
         scheduling: order.scheduling,
-        note: order.note,
+        note: order?.note ?? null,
         service: order.service,
         show: order.show,
         customerId: order.customer?.id ?? null,

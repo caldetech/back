@@ -6,11 +6,20 @@ import { Role } from 'src/schemas/role';
 export class InviteRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async updateInviteStatus(email: string) {
+  async updateInviteStatus({
+    email,
+    organizationId,
+  }: {
+    email: string;
+    organizationId: string;
+  }) {
     try {
       return await this.prisma.invite.update({
         where: {
-          email,
+          email_organizationId: {
+            email,
+            organizationId,
+          },
         },
         data: {
           status: 'ACCEPTED',
@@ -111,6 +120,11 @@ export class InviteRepository {
       const skip = (page - 1) * limit;
 
       const invites = await this.prisma.invite.findMany({
+        orderBy: [
+          {
+            createdAt: 'desc',
+          },
+        ],
         skip,
         take: limit,
         where: {

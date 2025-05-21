@@ -111,7 +111,7 @@ enum InviteStatus {
 
 model Invite {
   id        String   @id @default(uuid())
-  email     String @unique
+  email     String 
   role      Role
   createdAt DateTime @default(now()) @map("created_at")
   status InviteStatus @default(PENDING)
