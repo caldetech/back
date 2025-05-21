@@ -111,7 +111,7 @@ enum InviteStatus {
 
 model Invite {
   id        String   @id @default(uuid())
-  email     String
+  email     String @unique
   role      Role
   createdAt DateTime @default(now()) @map("created_at")
   status InviteStatus @default(PENDING)
@@ -248,7 +248,7 @@ model Order {
 
   scheduling DateTime
   service String
-  note String
+  note String?
 
   owner          Member?         @relation(fields: [ownerId], references: [id], onDelete: SetNull)
   ownerId         String?         @map("owner_id")

@@ -105,6 +105,7 @@ export class UserService {
 
     if (confirmedAccount) {
       await this.tokenService.deleteToken(tokenId);
+      await this.inviteService.updateInviteStatus(confirmedAccount.email);
     }
 
     return confirmedAccount;

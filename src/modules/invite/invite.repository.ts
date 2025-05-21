@@ -6,11 +6,11 @@ import { Role } from 'src/schemas/role';
 export class InviteRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async updateInviteStatus(id: string) {
+  async updateInviteStatus(email: string) {
     try {
       return await this.prisma.invite.update({
         where: {
-          id,
+          email,
         },
         data: {
           status: 'ACCEPTED',
