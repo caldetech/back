@@ -29,9 +29,6 @@ export class MemberService {
       organizationId,
     });
 
-    if (member) {
-    }
-
     return member;
   }
 
