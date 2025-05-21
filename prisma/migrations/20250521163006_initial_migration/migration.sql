@@ -310,9 +310,6 @@ CREATE UNIQUE INDEX "accounts_provider_account_id_key" ON "accounts"("provider_a
 CREATE UNIQUE INDEX "accounts_provider_account_id_user_id_key" ON "accounts"("provider_account_id", "user_id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "invites_email_key" ON "invites"("email");
-
--- CreateIndex
 CREATE UNIQUE INDEX "invites_email_organization_id_key" ON "invites"("email", "organization_id");
 
 -- CreateIndex
