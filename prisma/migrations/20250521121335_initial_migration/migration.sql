@@ -155,7 +155,7 @@ CREATE TABLE "product_orders" (
     "quantity" INTEGER NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "order_id" TEXT NOT NULL,
-    "product_id" TEXT,
+    "product_id" TEXT NOT NULL,
 
     CONSTRAINT "product_orders_pkey" PRIMARY KEY ("id")
 );
@@ -169,7 +169,7 @@ CREATE TABLE "orders" (
     "show" BOOLEAN NOT NULL DEFAULT true,
     "scheduling" TIMESTAMP(3) NOT NULL,
     "service" TEXT NOT NULL,
-    "note" TEXT NOT NULL,
+    "note" TEXT,
     "owner_id" TEXT,
     "organization_id" TEXT NOT NULL,
     "customer_id" TEXT,
@@ -397,9 +397,6 @@ CREATE INDEX "products_name_idx" ON "products"("name");
 CREATE INDEX "products_price_idx" ON "products"("price");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "products_organization_id_bling_id_key" ON "products"("organization_id", "bling_id");
-
--- CreateIndex
 CREATE UNIQUE INDEX "bling_tokens_organization_id_key" ON "bling_tokens"("organization_id");
 
 -- CreateIndex
@@ -481,7 +478,7 @@ ALTER TABLE "organizations" ADD CONSTRAINT "organizations_owner_id_fkey" FOREIGN
 ALTER TABLE "product_orders" ADD CONSTRAINT "product_orders_order_id_fkey" FOREIGN KEY ("order_id") REFERENCES "orders"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "product_orders" ADD CONSTRAINT "product_orders_product_id_fkey" FOREIGN KEY ("product_id") REFERENCES "products"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "product_orders" ADD CONSTRAINT "product_orders_product_id_fkey" FOREIGN KEY ("product_id") REFERENCES "products"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "orders" ADD CONSTRAINT "orders_owner_id_fkey" FOREIGN KEY ("owner_id") REFERENCES "members"("id") ON DELETE SET NULL ON UPDATE CASCADE;
