@@ -134,6 +134,11 @@ export class UserRepository {
       const skip = (page - 1) * limit;
 
       const users = await this.prisma.user.findMany({
+        orderBy: [
+          {
+            createdAt: 'desc',
+          },
+        ],
         skip,
         take: limit,
         where: {

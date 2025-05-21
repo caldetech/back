@@ -75,9 +75,9 @@ export class OrderController {
     }: {
       slug: string;
       type: OrderTypes;
-      paymentMethod: paymentMethodTypes;
+      paymentMethod?: paymentMethodTypes;
       paymentAmount?: number;
-      blingProducts: {
+      blingProducts?: {
         id: string;
         nome: string;
         preco: number;
@@ -85,7 +85,7 @@ export class OrderController {
         quantity: number;
       }[];
       service: string;
-      members: { id: string; name: string }[];
+      members?: { id: string; name: string }[];
       customer: {
         id: string;
         customerType: CustomerTypes;
@@ -96,7 +96,7 @@ export class OrderController {
       };
       showOrder: boolean;
       date: Date;
-      note: string;
+      note?: string;
     },
   ) {
     const user = req.user;

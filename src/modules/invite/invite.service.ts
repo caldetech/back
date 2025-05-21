@@ -25,8 +25,17 @@ export class InviteService {
     private readonly emailService: EmailService,
   ) {}
 
-  async updateInviteStatus(email: string) {
-    return await this.inviteRepository.updateInviteStatus(email);
+  async updateInviteStatus({
+    email,
+    organizationId,
+  }: {
+    email: string;
+    organizationId: string;
+  }) {
+    return await this.inviteRepository.updateInviteStatus({
+      email,
+      organizationId,
+    });
   }
 
   async deleteinviteById({ inviteId }: { inviteId: string }) {
@@ -87,6 +96,8 @@ export class InviteService {
         userId: user.id,
         organizationId: organization.id,
       });
+
+      await this.updateInviteStatus({ email, organizationId: organization.id });
 
       return {
         success: true,
