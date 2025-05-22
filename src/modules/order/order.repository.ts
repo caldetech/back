@@ -256,13 +256,9 @@ export class OrderRepository {
     try {
       const skip = (page - 1) * limit;
 
-      const isPrivileged = [
-        'ADMIN',
-        'BILLING',
-        'MANAGER',
-        'BILLING',
-        'DEV',
-      ].includes(role);
+      const isPrivileged = ['ADMIN', 'MANAGER', 'BILLING', 'DEV'].includes(
+        role,
+      );
 
       const whereClause = isPrivileged
         ? {
@@ -270,7 +266,11 @@ export class OrderRepository {
           }
         : {
             organization: { slug },
-            OR: [{ show: true }, { assignedMembers: { some: { memberId } } }],
+            OR: [
+              { show: true },
+              { ownerId: memberId },
+              { assignedMembers: { some: { memberId } } },
+            ],
           };
 
       const orders = await this.prisma.order.findMany({
